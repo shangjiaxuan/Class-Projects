@@ -1,14 +1,14 @@
 ﻿#include "Colors.h"
-#include "Crossing.h"
 
+using namespace std;
 
 void Colors::find_groups() {
-	std::cout << "\nFinding solutions...\n";
-	std::cout << "Please wait..." << std::endl;
+	cout << "\nFinding solutions...\n";
+	cout << "Please wait..." << endl;
 	for (int i = 0; i < Crossing::possi; i++) {
 		assign(i);
 	}
-	std::cout << "Done!\n" << std::endl;
+	cout << "Done!\n" << endl;
 }
 
 bool Colors::evaluate(int cur, int opp) {
@@ -33,16 +33,16 @@ void Colors::assign(int add) {
 }
 
 void Colors::print_result() {
-	std::cout << this->color_num << " groups needed for the grouping found! The folowing are the groups" << std::endl;
-	for (int i = 0; i < color_num; i++) {			//各个组的编号
-		std::cout << "Group No. " << i + 1 << ":\t";	//用1st啥的太麻烦了，英语语法还要写个函数...
+	cout <<"At least "<< this->color_num << " groups needed for the grouping! The folowing is one possibility:" << endl;
+	for (int i = 0; i < color_num; i++) {				//各个组的编号
+		cout << "Group No. " << i + 1 << ":\t";	//用1st啥的太麻烦了，英语语法还要写个函数...
 		for (int cur = 0; cur < Crossing::possi; cur++) {
 			if (this->group[cur] == i) {
-				std::cout << this->rel->This->routes[cur].from << "->" << this->rel->This->routes[cur].to << '\t';
+				cout << this->rel->This->routes[cur].from << "->" << this->rel->This->routes[cur].to << '\t';
 			}
 		}
-		std::cout << std::endl;
+		cout << endl;
 	}
-	std::cout << std::endl;
+	cout << endl;
 }
 

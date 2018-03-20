@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "Crossing.h"
 
 class Colors {

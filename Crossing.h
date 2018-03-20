@@ -12,6 +12,10 @@
 class Colors;
 
 namespace Crossing {
+
+	class Roads;
+	class relations;
+
 	EXT short number;
 	EXT bool* in;
 	EXT bool* out;
@@ -21,19 +25,21 @@ namespace Crossing {
 	EXT int possi;
 
 	class Roads {
-	public:
-//		Roads(short num);
+	protected:
 		struct route {
 			short from;					//实际的来路
 			short to;					//实际的去向
 			int offset;					//这个走法在二维数组中的对应的编号
 		};
-		route* routes;
-		Roads();
+		friend relations;
+	private:
 		void get_status();
 		void init(route*& rt);
-	private:
-
+	public:
+//		Roads(short num);
+		route* routes;
+		Roads();
+		~Roads();
 	};
 
 	class relations :	public Array_2D<bool>
@@ -41,11 +47,11 @@ namespace Crossing {
 	{
 	public:
 		relations(Roads& rd) :Array_2D<bool>(possi, possi) { This = &rd; }
-		virtual ~relations() = default;
+//		virtual ~relations() = default;
 		Roads* This;
 		void find_relations();
 		void print_rel();
-		friend Colors;
+//		friend Colors;
 	protected:
 		bool compatible(Roads::route& rt1, Roads::route& rt2);
 		char rela(Roads::route rt, short pos);

@@ -1,6 +1,5 @@
 ﻿#include "Array_2D.h"
 
-
 template<typename type>
 Array_2D<type>::Array_2D(const int& row, const int& col) {
 	this->data = new type[row*col];
