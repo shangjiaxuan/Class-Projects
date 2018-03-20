@@ -154,11 +154,13 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="Crossing.h" />
     <ClInclude Include="Test.h" />
+    <ClInclude Include="Colors.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Array_2D.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Crossing.cpp" />
+    <ClCompile Include="Colors.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

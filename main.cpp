@@ -2,6 +2,7 @@
 
 #include "main.h"
 #include "Test.h"
+#include "Colors.h"
 //#include "Test.h"
 
 using namespace std;
@@ -9,10 +10,14 @@ using namespace std;
 using namespace Crossing;
 
 int main(){
+	//让用户输入，并算出各种路线的关系
 	Roads current;
-	relations rel{ current };// = relations{ possi,possi };
+	relations rel{ current };
 	rel.find_relations();
 	rel.print_rel();
+	Colors color{rel};
+	color.find_groups();
+	color.print_result();
 	system("pause");
     return 0;
 }

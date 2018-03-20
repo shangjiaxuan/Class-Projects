@@ -9,6 +9,8 @@
 #define EXT
 #endif
 
+class Colors;
+
 namespace Crossing {
 	EXT short number;
 	EXT bool* in;
@@ -39,12 +41,11 @@ namespace Crossing {
 	{
 	public:
 		relations(Roads& rd) :Array_2D<bool>(possi, possi) { This = &rd; }
-//		relations();
-//		relations(const int& row, const int& col) :Array_2D<bool>(row, col) {};
 		virtual ~relations() = default;
 		Roads* This;
 		void find_relations();
 		void print_rel();
+		friend Colors;
 	protected:
 		bool compatible(Roads::route& rt1, Roads::route& rt2);
 		char rela(Roads::route rt, short pos);
