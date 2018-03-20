@@ -18,7 +18,7 @@ int main(){
 			function();
 		}
 		catch (exception& e) {
-			cout << e.what() << '\n' << endl;
+			cout << '\n' << e.what() << '\n' << endl;
 			cin.clear();
 		}
 		not_1st = true;

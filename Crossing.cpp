@@ -7,7 +7,7 @@ using namespace std;
 namespace Crossing {
 	Roads::Roads() {
 		cout << "Please input the number of roads at the junction:\n" << endl;
-		if(cin >> number) {
+		if(cin >> number && number>1) {
 			in = new bool[number];
 			out = new bool[number];
 			cout << "\nPlease input the parameters for each road. '-1' for one-way in, '1' for one-way out, and '0' for two-way road.\n";

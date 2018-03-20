@@ -2,15 +2,15 @@
 
 using namespace std;
 
+void name_ver() {
+	cout << "\nCrossing \n";
+	cout << "Version 0.0.0.0\n" << endl;
+}
+
 void prompt() {
 	cout << "This program can calculate the smallest possible number of route groups needed \nfor a crossing with given number and state of roads to function.\n" << endl;
 	cout << "The roads may be two-ways or one-way roads according to your input.\n" << endl;
 	cout << endl;
-}
-
-void name_ver() {
-	cout << "\nCrossing \n";
-	cout << "Version 0.0.0.0\n" << endl;
 }
 
 void function() {
@@ -31,7 +31,9 @@ void Exit() {
 	switch (c) {
 	case 'n': case 'N':
 		exit(0);
-	default:
+	case '\n': case 'y': case 'Y':
 		break;
+	default:
+		throw runtime_error("Exit(): Unkown choice encountered!");
 	}
 }
