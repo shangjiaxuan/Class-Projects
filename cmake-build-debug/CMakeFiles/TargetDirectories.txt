@@ -1,3 +1,0 @@
-C:/Users/shangjiaxuan/Documents/Source code/Class Projects/Crossing/Crossing/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-C:/Users/shangjiaxuan/Documents/Source code/Class Projects/Crossing/Crossing/cmake-build-debug/CMakeFiles/Crossing.dir
-C:/Users/shangjiaxuan/Documents/Source code/Class Projects/Crossing/Crossing/cmake-build-debug/CMakeFiles/edit_cache.dir
