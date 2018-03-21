@@ -44,6 +44,7 @@ namespace Crossing {
 */
 	Roads::~Roads() {
 		delete[] routes;
+		routes = nullptr;
 	}
 
 	void Roads::get_status() {

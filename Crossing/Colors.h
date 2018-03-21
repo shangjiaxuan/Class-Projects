@@ -14,7 +14,8 @@ public:
 		group = new int[Crossing::possi];
 	}
 	~Colors() {
-		delete[] this->group;
+		delete[] group;
+		group = nullptr;
 	}
 	void find_groups();
 	void print_result();
