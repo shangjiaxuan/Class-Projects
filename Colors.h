@@ -20,7 +20,7 @@ public:
 	void print_result();
 protected:
 	Crossing::relations* rel;
-	int color_num{ 1 };
+	int color_num{ 0 };
 	int* group;									//和struct route对应的分组数组
 	bool evaluate(int cur, int opp);			//看某个元素能否加入目前的组
 	void assign(int add);						//给某个元素分配一个组

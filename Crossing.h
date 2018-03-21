@@ -29,7 +29,7 @@ namespace Crossing {
 		struct route {
 			short from;					//实际的来路
 			short to;					//实际的去向
-			int offset;					//这个走法在二维数组中的对应的编号
+//			int offset;					//这个走法在二维数组中的对应的编号
 		};
 		friend relations;
 	private:
@@ -48,7 +48,7 @@ namespace Crossing {
 	public:
 		relations(Roads& rd) :Array_2D<bool>(possi, possi) { This = &rd; }
 //		virtual ~relations() = default;
-		Roads* This;
+		const Roads* This;
 		void find_relations();
 		void print_rel();
 //		friend Colors;

@@ -16,6 +16,8 @@ namespace Crossing {
 			possi = no_in * no_out - two_ways;
 			this->routes = new route[possi];
 			this->init(this->routes);
+			delete[] in;
+			delete[] out;
 			return;
 		}
 		throw runtime_error("Roads(): Cannot initialize the roads!");
@@ -87,7 +89,7 @@ namespace Crossing {
 					if (out[j] && j != i) {
 						rt[cur_offset].from = i;
 						rt[cur_offset].to = j;
-						rt[cur_offset].offset = cur_offset;		//不想再让它计算了，存储量不多，调用应该蛮多的
+//						rt[cur_offset].offset = cur_offset;		//不想再让它计算了，存储量不多，调用应该蛮多的
 						cur_offset++;
 					}
 					j++;
