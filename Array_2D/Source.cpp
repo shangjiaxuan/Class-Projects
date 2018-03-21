@@ -1,4 +1,5 @@
-﻿#include "Array_2D.h"
+#include  "stdafx.h"
+
 
 template<typename type>
 Array_2D<type>::Array_2D(const int& row, const int& col) {
@@ -27,5 +28,20 @@ void Array_2D<type>::write(type* pos, type val) {
 	*pos = val;
 }
 
-
 template class Array_2D<bool>;
+
+void print_data(relations& arr) {
+	for(int k=0; k<num; k++) {
+		for(int j=0; j<num; j++) {
+			std::cout<<arr.map[k][k];
+		}
+	}
+}
+
+void init(relations& arr) {
+	for (int k = 0; k<num; k++) {
+		for (int j = 0; j<num; j++) {
+			arr.map[k][k] = true;
+		}
+	}
+}
