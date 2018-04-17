@@ -59,10 +59,10 @@ public:
 	void save();
 	void load();
 private:
-	ifstream index_input;
-	ofstream index_output;
-	ifstream booklist_input;
-	ofstream booklist_output;
+	std::ifstream index_input;
+	std::ofstream index_output;
+	std::ifstream booklist_input;
+	std::ofstream booklist_output;
 	//用于find函数的返回值
 	struct found {
 		//the status of the found item

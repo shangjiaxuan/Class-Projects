@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Header.h"
 
@@ -15,12 +15,12 @@ struct item {
 	item* next;
 };
 
-struct node {				//×Ö·û½Úµã
+struct node {				//å­—ç¬¦èŠ‚ç‚¹
 	node();
 	~node();
 	node** next;
 	item* head;
-	//ÒÔºó¿¼ÂÇ¸ÄĞ´´úÂëºÃ¿´Ğ©ÊÔÊÔ
+	//ä»¥åè€ƒè™‘æ”¹å†™ä»£ç å¥½çœ‹äº›è¯•è¯•
 	node*& operator [] (size_t elem) {
 		return *&next[elem];
 	}
@@ -33,7 +33,7 @@ struct node {				//×Ö·û½Úµã
 };
 
 
-class CharTree {			//×Ö·ûÊ÷µÄÍ·ºÍ²Ù×÷
+class CharTree {			//å­—ç¬¦æ ‘çš„å¤´å’Œæ“ä½œ
 public:
 //	CharTree() = default;
 //	~CharTree();
@@ -43,6 +43,9 @@ public:
 	node* add_token(std::string token);
 	bool one_succ(node** list);
 	bool del_token(std::string token);
-	void save(ofstream& ofs);
-	void load(ifstream& ifs);
+	void save(std::ofstream& ofs);
+	void save_loop(node* current, std::ofstream& ofs);
+	void load(std::ifstream& ifs);
+	void load_loop(node* current, std::ifstream& ifs);
+	void item_list(node* current, std::ifstream& ifs);
 };

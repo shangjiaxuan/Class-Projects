@@ -1,11 +1,13 @@
 ﻿#include "CharTree.h"
 #include "Booklist.h"
 
+using namespace std;
+
 node::node() {
 	next = new node*[CharNum];
-  for (int i; i<CharNum; i++){
-    next[i] = nullptr;
-  }
+	for(int i; i < CharNum; i++) {
+		next[i] = nullptr;
+	}
 	head = nullptr;
 }
 
@@ -106,71 +108,72 @@ bool CharTree::one_succ(node** list) {
 	return true;
 }
 
-void CharTree::save(ofstream& ofs){
-  node* current = &head;
-  save_loop(current, ofs);
+
+void CharTree::save(ofstream& ofs) {
+	node* current = &head;
+	save_loop(current, ofs);
 }
 
-void CharTree::save_loop(node* current, ofstream& ofs){
-  for (unsigned char i=0; i<CharNum; i++){
-    if(current->next[i]){
-      ofs << reinterpret_cast<char>(i);
-      save_loop(next[i], ofs);
-    }
-    else{
-      ofs << '\t';
-    }
-    if(current->head){
-      ofs<<'{'
-      item* label = current->head;
-      do {
-        ofs<<label->index_number<<' ';
-      } while(label->next);
-      ofs<<'}'
-    }
-  }
+void CharTree::save_loop(node* current, ofstream& ofs) {
+	for(unsigned char i = 0; i < CharNum; i++) {
+		if(current->next[i]) {
+			ofs << reinterpret_cast<char&>(i);
+			save_loop(current->next[i], ofs);
+		} else {
+			ofs << '\t';
+		}
+		if(current->head) {
+			ofs << '{';
+			item* label = current->head;
+			do {
+				ofs << label->index_number << ' ';
+			}
+			while(label->next);
+			ofs << '}';
+		}
+	}
 }
 
-void CharTree::load(ifstream& ifs){
-  char temp;
-  node* current = &head;
-  load_loop(current, ifs);
+void CharTree::load(ifstream& ifs) {
+	char temp;
+	node* current = &head;
+	load_loop(current, ifs);
 }
 
-void CharTree::load_loop(node* current, ifstram& ifs){
-  ifs.get(temp);
-  switch(temp){
-    case '\t':
-      if(ifs.peek()=='{'){
-        item_list(current,ifs);
-      }
-      break;
-    default:
-      next[reinterpret_cast<unsigned char>(temp)] = new node;
-      load_loop(next[reinterpret_cast<unsigned char>(temp)], ifs);
-  }
+void CharTree::load_loop(node* current, ifstream& ifs) {
+	char temp;
+	ifs.get(temp);
+	switch(temp) {
+		case '\t':
+			if(ifs.peek() == '{') {
+				item_list(current, ifs);
+			}
+			break;
+		default:
+			current->next[reinterpret_cast<unsigned char&>(temp)] = new node;
+			load_loop(current->next[reinterpret_cast<unsigned char&>(temp)], ifs);
+	}
 }
 
-void CharTree::item_list(node* current, ifstram& ifs){
-  int index_number;
-  item* cur = current->head;
-  char temp;
-  ifs.get(temp);
-  while(temp!='}'){
-    ifs.putback(temp);
-    ifs>>index_number;
-    cur->index_number=index_number;
-    ifs.get();
-    ifs.get(temp);
-    if(isdigit(temp)){
-      cur->next=new item;
-      cur=cur->next;
-      ifs.putback(temp);
-    }
-    else{
-      cur->next=nullptr;
-      break;
-    }
-  }
-  break;
+void CharTree::item_list(node* current, ifstream& ifs) {
+	int index_number;
+	item* cur = current->head;
+	char temp;
+	ifs.get(temp);
+	while(temp != '}') {
+		ifs.putback(temp);
+		ifs >> index_number;
+		cur->index_number = index_number;
+		ifs.get();
+		ifs.get(temp);
+		if(isdigit(temp)) {
+			cur->next = new item;
+			cur = cur->next;
+			ifs.putback(temp);
+		} else {
+			cur->next = nullptr;
+			break;
+		}
+	}
+	// break;
 }

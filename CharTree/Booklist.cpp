@@ -1,4 +1,4 @@
-#include "Booklist.h"
+ï»¿#include "Booklist.h"
 
 using namespace std;
 
@@ -25,7 +25,7 @@ volume* Book::reindex(Book::found original) {
 	original.rtn->index_number = index;
 	original.rtn->next = cur;
 	traceback->next = original.rtn;
-	//ÕÒ³öËùÓĞ¹Ø¼ü´Ê£¬ÓÃ¹Ø¼ü´Ê·ÃÎÊÊéÄ¿Á´±í£¬ÖØÃüÃûËùÓĞoindexÎªindex
+	//æ‰¾å‡ºæ‰€æœ‰å…³é”®è¯ï¼Œç”¨å…³é”®è¯è®¿é—®ä¹¦ç›®é“¾è¡¨ï¼Œé‡å‘½åæ‰€æœ‰oindexä¸ºindex
 	vector<string> tokens = get_tokens(original.name);
 	int s = tokens.size();
 	for(int i=0;i<s;i++) {
@@ -45,13 +45,13 @@ volume* Book::reindex(Book::found original) {
 }
 
 Book::found Book::find(int index) {
-	if (booklist_head.index_number==-2) {
+	if (booklist_head->index_number==-2) {
 		return { 'N', nullptr , nullptr };
 	}
-	if (index < booklist_head.index_number) {
-		return { 'S' , nullptr, &booklist_head };
+	if (index < booklist_head->index_number) {
+		return { 'S' , nullptr, booklist_head };
 	}
-	volume* current = &booklist_head;
+	volume* current = booklist_head;
 	volume* traceback = nullptr;
 	while (index > current->index_number) {
 		if (current->next == nullptr) {
@@ -67,12 +67,12 @@ Book::found Book::find(int index) {
 }
 
 Book::found Book::find(std::string name) {
-	if (booklist_head.index_number==-2) {
+	if (booklist_head->index_number==-2) {
 		return { 'N', nullptr , nullptr };
 	}
-	volume* current = &booklist_head;
+	volume* current = booklist_head;
 	volume* traceback = nullptr;
-	if (booklist_head.name != name) {
+	if (booklist_head->name != name) {
 		while (current->next != nullptr) {
 			traceback = current;
 			current = current->next;
@@ -103,10 +103,10 @@ bool Book::add(std::string name) {
 	case 'P':
 		return false;
 	case 'N':
-		booklist_head.name = name;
-		booklist_head.fixed_index = false;
-		booklist_head.index_number = 0;
-		booklist_head.next = nullptr;
+		booklist_head->name = name;
+		booklist_head->fixed_index = false;
+		booklist_head->index_number = 0;
+		booklist_head->next = nullptr;
 		{vector<string> tokens = get_tokens(name);
 		int size = tokens.size();
 		for (int i = 0; i < size; i++) {
@@ -116,13 +116,13 @@ bool Book::add(std::string name) {
 		return true;
 	case 'X':
 	{
-		if (booklist_head.index_number != 0) {
+		if (booklist_head->index_number != 0) {
 			volume* add = new volume;
-			add->next = &booklist_head;
+			add->next = booklist_head;
 			add->index_number = 0;
 			add->name = name;
 			add->fixed_index = false;
-			booklist_head = *add;
+			booklist_head = add;
 			{vector<string> tokens = get_tokens(name);
 			int s = tokens.size();
 			for (int i = 0; i < s; i++) {
@@ -132,8 +132,8 @@ bool Book::add(std::string name) {
 			return true;
 		}
 		int index = 1;
-		volume* xconti = booklist_head.next;
-		volume* track = &booklist_head;
+		volume* xconti = booklist_head->next;
+		volume* track = booklist_head;
 		while (xconti->index_number == index) {
 			track = xconti;
 			xconti = xconti->next;
@@ -184,10 +184,10 @@ bool Book::add(int index, std::string name) {
 	}
 	case 'N':
 		{
-		booklist_head.name = name;
-		booklist_head.fixed_index = true;
-		booklist_head.index_number = index;
-		booklist_head.next = nullptr;
+		booklist_head->name = name;
+		booklist_head->fixed_index = true;
+		booklist_head->index_number = index;
+		booklist_head->next = nullptr;
 		}
 		return true;
 	case 'S':
@@ -196,8 +196,8 @@ bool Book::add(int index, std::string name) {
 		newh->name = name;
 		newh->index_number = index;
 		newh->fixed_index = true;
-		newh->next = booklist_head.next;
-		booklist_head = *newh;
+		newh->next = booklist_head->next;
+		booklist_head = newh;
 		return true;
 		}
 	case 'L': case 'M':
@@ -259,7 +259,7 @@ bool Book::del(std::string name) {
 }
 
 
-//ÓĞ´óĞ´ÓÖÓĞĞ¡Ğ´µÄ¹æ·¶ºÜ¸´ÔÓ£¬Òª¿¼ÂÇ´ÊµÄĞÔÖÊºÍ³¤¶È£¬»¹ÓĞ¡°I¡±Ò»ÀàµÄ´Ê£¬¸É´àÓ¢ÎÄÈ«´óĞ´£¨¾¡¹ÜÍêÈ«ºÍ´ÊÏà¹Ø£¬ºÍÎ»ÖÃ¹ØÏµ²»´ó£¨³ıÁËµÚÒ»¸ö´Ê£©£©
+//æœ‰å¤§å†™åˆæœ‰å°å†™çš„è§„èŒƒå¾ˆå¤æ‚ï¼Œè¦è€ƒè™‘è¯çš„æ€§è´¨å’Œé•¿åº¦ï¼Œè¿˜æœ‰â€œIâ€ä¸€ç±»çš„è¯ï¼Œå¹²è„†è‹±æ–‡å…¨å¤§å†™ï¼ˆå°½ç®¡å®Œå…¨å’Œè¯ç›¸å…³ï¼Œå’Œä½ç½®å…³ç³»ä¸å¤§ï¼ˆé™¤äº†ç¬¬ä¸€ä¸ªè¯ï¼‰ï¼‰
 void Book::To_standard(std::string& bookname) {
 	const int size = bookname.size();
 	for(int i=0; i<size; i++) {
@@ -292,7 +292,7 @@ bool Book::istoken(std::string token) {
 	return true;
 }
 
-void load(){
+void Book::load(){
 	index_input.open("index.dat",ios::binary);
 	booklist_input.open("booklist.dat",ios::binary);
 	while() {
@@ -306,7 +306,7 @@ void load(){
 	booklist_input.close();
 }
 
-void save() {
+void Book::save() {
 	index_output.open("index.dat", ios::binary);
 	booklist_output.open("booklist.dat", ios::binary);
 	
