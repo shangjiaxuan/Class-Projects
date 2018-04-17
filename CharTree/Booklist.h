@@ -4,6 +4,10 @@
 #include "CharTree.h"
 
 
+
+class list;
+class Book;
+
 //所有书目中一本书对应的链表节点
 struct volume {
 	volume() {
@@ -24,6 +28,38 @@ struct volume {
 	volume* next;
 };
 
+class list {
+	list() {
+		head = nullptr;
+	}
+	~list() {
+		if(head) {
+			head->~volume();
+			delete head;
+			head = nullptr;
+		}
+	}
+	friend Book;
+	volume* head;
+	void add(volume* previous, int index, std::string name, bool index_type);
+	struct found {
+		//the status of the found item
+		//legend:
+		//N: head==nullptr
+		//L: the specified index_number is larger than all current ones, rtn is the tail pointer
+		//S: the specified index_number is smaller than all current ones, rtn is the head pointer
+		//M: the specified index_number is in the middle of current ones, rtn is the largest one smaller than the specified index_number
+		//P: the specified index_number is found at rtn;
+		//X: book name string not found
+		char status;
+		volume* rtn;
+		volume* traceback;
+		std::string name;
+	};
+	found find(int index);
+	found find(std::string name);
+};
+
 //管理所有书目的链表
 //貌似应该再加一个保存到文件的功能，就叫“index.dat”和“booklist.dat”罢
 //这样就不需要非token的vector了（手动输入一次，保存）
@@ -33,18 +69,11 @@ struct volume {
 class Book {
 public:
 	Book() {
-//		CharTree index;
-//		volume booklist_head;
-		booklist_head = nullptr;
 		init_ntoken();
 		load();
 	}
-	~Book() {
-//		delete &booklist_head;
-//		delete &index;
-	};
 	//the linked list of books
-	volume* booklist_head;
+	list booklist;
 	//the index_number tree of tokens
 	CharTree index;
 	//if false, the index_number is already assigned as fixed
@@ -58,32 +87,16 @@ public:
 	bool del(std::string name);
 	void save();
 	void load();
-private:
+//private:
 	std::ifstream index_input;
 	std::ofstream index_output;
 	std::ifstream booklist_input;
 	std::ofstream booklist_output;
 	//用于find函数的返回值
-	struct found {
-		//the status of the found item
-		//legend:
-		//N: booklist_head==nullptr
-		//L: the specified index_number is larger than all current ones, rtn is the tail pointer
-		//S: the specified index_number is smaller than all current ones, rtn is the booklist_head pointer
-		//M: the specified index_number is in the middle of current ones, rtn is the largest one smaller than the specified index_number
-		//P: the specified index_number is found at rtn;
-		//X: book name string not found
-		char status;
-		volume* rtn;
-		volume* traceback;
-		std::string name;
-	};
-	found find(int index);
-	found find(std::string name);
 //这个函数不安全，放在private里面
-	void add(volume* previous, int index, std::string name, bool index_type);
+//	void add(volume* previous, int index, std::string name, bool index_type);
 //reassigns a default index_number and returns the volume before the index_number
-	volume* reindex(found original);
+	volume* reindex(list::found original);
 	void To_standard(std::string& bookname);
 	//为了加速，让非token对应的chartree节点的index头字符串对应一本编号
 	//“-1”的书
@@ -93,4 +106,6 @@ private:
 	void init_ntoken();
 //先简单地写一个表，肯定不完整，以后用户可以调用函数添加（同时删除原有链表）
 	std::vector<std::string> default_non_tokens{"THE","AM","IS","ARE","OF","AT","TO","UNDER","ABOVE"};
+
+	void print_tokens();
 };

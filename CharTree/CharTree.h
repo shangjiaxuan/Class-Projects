@@ -7,6 +7,7 @@
 struct item {
 	~item() {
 		if(next){
+			next->~item();
 			delete next;
 			next = nullptr;
 		}
@@ -37,7 +38,7 @@ class CharTree {			//字符树的头和操作
 public:
 //	CharTree() = default;
 //	~CharTree();
-	node head;
+	const node head;
 	node* locate(std::string token);
 	item* access(std::string token);
 	node* add_token(std::string token);

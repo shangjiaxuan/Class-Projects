@@ -5,7 +5,7 @@ using namespace std;
 
 node::node() {
 	next = new node*[CharNum];
-	for(int i; i < CharNum; i++) {
+	for(int i=0; i < CharNum; i++) {
 		next[i] = nullptr;
 	}
 	head = nullptr;
@@ -29,7 +29,7 @@ node::~node() {
 
 node* CharTree::locate(std::string token) {
 	const int size = token.size();
-	node* current = &head;
+	node* current = const_cast<node*>(&head);
 	for(int i=0; i<size; i++) {
 		if(current->next[reinterpret_cast<const unsigned char&>(token[i])]) {
 			current = current->next[reinterpret_cast<const unsigned char&>(token[i])];
@@ -46,7 +46,7 @@ item* CharTree::access(std::string token) {
 
 node* CharTree::add_token(std::string token) {
 	const int size = token.size();
-	node* current = &head;
+	node* current = const_cast<node*>(&head);
 	for (int i = 0; i < size; i++) {
 		if(current->next[reinterpret_cast<const unsigned char&>(token[i])]!=nullptr) {
 			current = current->next[reinterpret_cast<const unsigned char&>(token[i])];
@@ -64,7 +64,7 @@ node* CharTree::add_token(std::string token) {
 
 bool CharTree::del_token(std::string token) {
 	int size = token.size();
-	node* current = &head;
+	node* current = const_cast<node*>(&head);
 	//see if the character is the only one and the branch can be removed
 	bool* remove = new bool[size];
 	for (int i = 0; i<size; i++) {
@@ -110,12 +110,12 @@ bool CharTree::one_succ(node** list) {
 
 
 void CharTree::save(ofstream& ofs) {
-	node* current = &head;
+	node* current = const_cast<node*>(&head);
 	save_loop(current, ofs);
 }
 
 void CharTree::save_loop(node* current, ofstream& ofs) {
-	for(unsigned char i = 0; i < CharNum; i++) {
+	for(unsigned i = 0; i < CharNum; i++) {
 		if(current->next[i]) {
 			ofs << reinterpret_cast<char&>(i);
 			save_loop(current->next[i], ofs);
@@ -136,7 +136,7 @@ void CharTree::save_loop(node* current, ofstream& ofs) {
 
 void CharTree::load(ifstream& ifs) {
 	char temp;
-	node* current = &head;
+	node* current = const_cast<node*>(&head);
 	load_loop(current, ifs);
 }
 
