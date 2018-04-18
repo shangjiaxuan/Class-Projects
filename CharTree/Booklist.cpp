@@ -50,6 +50,11 @@ void list::add(volume* previous, int index, std::string name, bool index_type) {
 	current->index_number = index;
 	current->fixed_index = index_type;
 	current->name = name;
+	if (!previous) {
+		current->volume_next = head;
+		head = current;
+		return;
+	}
 	current->volume_next = previous->volume_next;
 	previous->volume_next = current;
 }
@@ -73,10 +78,13 @@ volume* Book::reindex(list::found original) {
 	volume* traceback= original.rtn;
 	volume* cur = traceback->volume_next;
 	int index = original.rtn->index_number + 1;
-	while(index==cur->index_number) {
+	while(cur->fixed_index&&index==cur->index_number) {
 		traceback = cur;
 		cur = cur->volume_next;
 		index++;
+		if(!cur) {
+			break;
+		}
 	}
 	original.traceback = original.rtn->volume_next;
 	original.rtn->index_number = index;

@@ -3,7 +3,6 @@
 #include "Header.h"
 #include "CharTree.h"
 
-class UI;
 class Book;
 class list;
 class CharTree;
@@ -88,7 +87,6 @@ public:
 	bool del(std::string name);
 	void save();
 	void load();
-	friend UI;
 //private:
 	std::ifstream index_input;
 	std::ofstream index_output;

@@ -1,7 +1,8 @@
 #include "CharTree.h"
 #include "Booklist.h"
+#include "UI.h"
 
-int main() {
+int main_ori() {
 	Book test;
 	std::string s = "HELLO!";
 	test.add(s);
@@ -12,5 +13,13 @@ int main() {
 	system("pause");
 //	test.save();
 	return 0;
+}
+
+int main(int argc, char* argv[]) {
+	UI This;
+	while(true) {
+		This.UI_main();
+	}
+
 }
 
