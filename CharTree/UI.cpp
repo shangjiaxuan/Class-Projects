@@ -26,7 +26,7 @@ void UI::add() {
 	add_manual(cmd);
 }
 
-string parse_path(string line) {
+string UI::parse_path(string line) {
 	string path;
 	istringstream iss(line);
 	char current;

@@ -30,5 +30,6 @@ public:
 	void list_string(std::string line);
 
 	std::string parse_bookname(std::string line);
+	std::string parse_path(std::string line);
 };
 
