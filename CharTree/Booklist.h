@@ -3,29 +3,29 @@
 #include "Header.h"
 #include "CharTree.h"
 
-
-
-class list;
+class UI;
 class Book;
+class list;
+class CharTree;
 
 //所有书目中一本书对应的链表节点
 struct volume {
 	volume() {
 		index_number = -2;
-		next = nullptr;
+		volume_next = nullptr;
 	}
 	//利用delete递归调用析构函数的特点一次性释放书目链表
 	~volume() {
-		if (next) {
-			next->~volume();
-			delete next;
-			next = nullptr;
+		if (volume_next) {
+//			volume_next->~volume();
+			delete volume_next;
+			volume_next = nullptr;
 		}
 	}
 	int index_number;
 	bool fixed_index{ false };
 	std::string name;
-	volume* next;
+	volume* volume_next;
 };
 
 class list {
@@ -34,9 +34,9 @@ class list {
 	}
 	~list() {
 		if(head) {
-			head->~volume();
+//			head->~volume();
 			delete head;
-			head = nullptr;
+//			head = nullptr;
 		}
 	}
 	friend Book;
@@ -83,10 +83,12 @@ public:
 	bool add(int index, std::string name);
 	//if false, the name's already taken.
 	bool add(std::string name);
+	void add(std::istream& ist);
 	bool del(int index);
 	bool del(std::string name);
 	void save();
 	void load();
+	friend UI;
 //private:
 	std::ifstream index_input;
 	std::ofstream index_output;

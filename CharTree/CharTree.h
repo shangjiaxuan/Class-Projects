@@ -6,14 +6,14 @@
 
 struct item {
 	~item() {
-		if(next){
-			next->~item();
-			delete next;
-			next = nullptr;
+		if(next_item){
+			next_item->~item();
+			delete next_item;
+			next_item = nullptr;
 		}
 	}
 	int index_number;
-	item* next;
+	item* next_item{ nullptr };
 };
 
 struct node {				//字符节点
@@ -27,7 +27,7 @@ struct node {				//字符节点
 	}
 	void add(int index) {
 		item* cur = new item;
-		cur->next = head;
+		cur->next_item = head;
 		cur->index_number = index;
 		head = cur;
 	}
@@ -48,5 +48,10 @@ public:
 	void save_loop(node* current, std::ofstream& ofs);
 	void load(std::ifstream& ifs);
 	void load_loop(node* current, std::ifstream& ifs);
+	void load_loop_start(std::ifstream& ifs);
 	void item_list(node* current, std::ifstream& ifs);
+
+	bool node_found;
+	std::string find_node(node* target);
+	void find_node_loop(node* target, node* current, std::string& token);
 };

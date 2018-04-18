@@ -1,7 +1,10 @@
 ﻿#pragma once
 
-#include "CharTree.h"
 #include "Booklist.h"
 
+class UI {
+	UI(){};
+private:
 
+};
 

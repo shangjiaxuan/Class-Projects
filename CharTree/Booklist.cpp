@@ -7,21 +7,21 @@ list::found list::find(int index) {
 		return { 'N', nullptr , nullptr };
 	}
 	if (index < head->index_number) {
-		return { 'S' , nullptr, head };
+		return { 'S' , nullptr, head->volume_next };
 	}
 	volume* current = head;
 	volume* traceback = nullptr;
 	while (index > current->index_number) {
-		if (current->next == nullptr) {
+		if (current->volume_next == nullptr) {
 			return { 'M' , current, nullptr };
 		}
 		traceback = current;
-		current = current->next;
+		current = current->volume_next;
 	}
 	if (index == current->index_number) {
 		return { 'P' , current, traceback, current->name };
 	}
-	return { 'L' , nullptr, traceback };
+	return { 'L' , nullptr, traceback->volume_next };
 }
 
 list::found list::find(std::string name) {
@@ -31,9 +31,9 @@ list::found list::find(std::string name) {
 	volume* current = head;
 	volume* traceback = nullptr;
 	if (head->name != name) {
-		while (current->next != nullptr) {
+		while (current->volume_next != nullptr) {
 			traceback = current;
-			current = current->next;
+			current = current->volume_next;
 			if (current->name == name) {
 				break;
 			}
@@ -50,8 +50,8 @@ void list::add(volume* previous, int index, std::string name, bool index_type) {
 	current->index_number = index;
 	current->fixed_index = index_type;
 	current->name = name;
-	current->next = previous->next;
-	previous->next = current;
+	current->volume_next = previous->volume_next;
+	previous->volume_next = current;
 }
 
 
@@ -60,34 +60,38 @@ void list::add(volume* previous, int index, std::string name, bool index_type) {
 void Book::init_ntoken() {
 	int size = default_non_tokens.size();
 	for (int i = 0; i < size; i++) {
-		index.add_token(default_non_tokens[i])->head->index_number = -1;
+		node* added = index.add_token(default_non_tokens[i]);
+		if(!added->head) {
+			added->head = new item;
+		}
+		added->head->index_number = -1;
 	}
 }
 
 volume* Book::reindex(list::found original) {
 	const int oindex = original.rtn->index_number;
 	volume* traceback= original.rtn;
-	volume* cur = traceback->next;
+	volume* cur = traceback->volume_next;
 	int index = original.rtn->index_number + 1;
 	while(index==cur->index_number) {
 		traceback = cur;
-		cur = cur->next;
+		cur = cur->volume_next;
 		index++;
 	}
-	original.traceback->next = original.rtn->next;
+	original.traceback = original.rtn->volume_next;
 	original.rtn->index_number = index;
-	original.rtn->next = cur;
-	traceback->next = original.rtn;
+	original.rtn->volume_next = cur;
+	traceback->volume_next = original.rtn;
 	//找出所有关键词，用关键词访问书目链表，重命名所有oindex为index
 	vector<string> tokens = get_tokens(original.name);
 	int s = tokens.size();
 	for(int i=0;i<s;i++) {
 		if(item* temp = this->index.locate(tokens[i])->head) {
 			while (temp->index_number != oindex) {
-				if (!temp->next) {
+				if (!temp->next_item) {
 					throw runtime_error("Book::reindex: cannot find original index in a certain token");
 				}
-				temp = temp->next;
+				temp = temp->next_item;
 			}
 			temp->index_number = index;
 		}else {
@@ -97,14 +101,55 @@ volume* Book::reindex(list::found original) {
 	return original.traceback;
 }
 
-//void Book::add(volume* previous, int index, std::string name, bool index_type) {
-//	volume* current = new volume;
-//	current->index_number = index;
-//	current->fixed_index = index_type;
-//	current->name = name;
-//	current->next = previous->next;
-//	previous->next = current;
-//}
+void Book::add(istream& ist) {
+	string start;
+	int index;
+	while(!ist.eof()) {
+		ist >> start;
+		istringstream convert(start);
+		if (convert >> index) {
+			char id;
+			string bookname;
+			ist >> id;
+			char c;
+			ist.get(c);
+			while(c==' ') {
+				ist.get(c);
+			}
+			ist.putback(c);
+			getline(ist, bookname);
+			switch (id) {
+			case 't':
+			{
+				bool success = add(index, bookname);
+				if (!success) {
+					throw runtime_error("Book::add: fixed index exists!");
+				}
+				break;
+			}
+			case 'f':
+			{
+				bool success = add(bookname);
+				if (!success) {
+					throw runtime_error("Book::add: bookname exists!");
+				}
+				break;
+			}
+			}
+//			ist.ignore(numeric_limits<streamsize>::max(), '\n');
+		}
+		else {
+			string following;
+			getline(ist, following);
+			start += following;
+			bool success = add(start);
+			if(!success) {
+				throw runtime_error("Book::add: bookname exists!");
+			}
+		}
+	}
+}
+
 
 bool Book::add(std::string name) {
 	To_standard(name);
@@ -117,7 +162,7 @@ bool Book::add(std::string name) {
 		booklist.head->name = name;
 		booklist.head->fixed_index = false;
 		booklist.head->index_number = 0;
-		booklist.head->next = nullptr;
+		booklist.head->volume_next = nullptr;
 		{vector<string> tokens = get_tokens(name);
 		int size = tokens.size();
 		for (int i = 0; i < size; i++) {
@@ -127,9 +172,18 @@ bool Book::add(std::string name) {
 		return true;
 	case 'X':
 	{
-		if (booklist.head->index_number != 0) {
+//		if(!booklist.head) {
+//			volume* add = new volume;
+//			add->volume_next = booklist.head;
+//			add->index_number = 0;
+//			add->name = name;
+//			add->fixed_index = false;
+//			booklist.head = add;
+//		}
+
+		if (booklist.head->index_number > 0) {
 			volume* add = new volume;
-			add->next = booklist.head;
+			add->volume_next = booklist.head;
 			add->index_number = 0;
 			add->name = name;
 			add->fixed_index = false;
@@ -142,15 +196,25 @@ bool Book::add(std::string name) {
 			}
 			return true;
 		}
-		int index = 1;
-		volume* xconti = booklist.head->next;
-		volume* track = booklist.head;
-		while (xconti->index_number == index) {
+		int index = 0;
+		volume* xconti = booklist.head;
+		volume* track = nullptr;
+		while (xconti->index_number == index&&xconti->volume_next) {
 			track = xconti;
-			xconti = xconti->next;
+			xconti = xconti->volume_next;
 			index++;
 		}
-		booklist.add(track, index, name, false);
+		if(track==nullptr) {
+			booklist.head = new volume;
+			booklist.head->name = name;
+			booklist.head->fixed_index = false;
+			booklist.head->index_number = 0;
+			booklist.head->volume_next = nullptr;
+
+		}
+		else {
+			booklist.add(track, index, name, false);
+		}
 		{vector<string> tokens = get_tokens(name);
 		int size = tokens.size();
 		for (int i = 0; i < size; i++) {
@@ -199,7 +263,7 @@ bool Book::add(int index, std::string name) {
 		booklist.head->name = name;
 		booklist.head->fixed_index = true;
 		booklist.head->index_number = index;
-		booklist.head->next = nullptr;
+		booklist.head->volume_next = nullptr;
 		}
 		return true;
 	case 'S':
@@ -208,11 +272,12 @@ bool Book::add(int index, std::string name) {
 		newh->name = name;
 		newh->index_number = index;
 		newh->fixed_index = true;
-		newh->next = booklist.head->next;
+		newh->volume_next = booklist.head->volume_next;
 		booklist.head = newh;
 		return true;
 		}
-	case 'L': case 'M':
+	case 'L': 
+	case 'M':
 	{
 		booklist.add(temp.rtn, index, name, true);
 		return true;
@@ -228,9 +293,15 @@ bool Book::del(int index) {
 	list::found temp = booklist.find(index);
 	switch(temp.status) {
 	case 'P':
-		temp.traceback->next = temp.rtn->next;
-		delete[] temp.rtn;
-		temp.rtn = nullptr;
+		if (temp.traceback) {
+			temp.traceback = temp.rtn->volume_next;
+			temp.rtn->volume_next = nullptr;
+			delete temp.rtn;
+		}
+		else {
+			delete temp.rtn;
+			booklist.head = nullptr;
+		}
 		{string name = temp.name;
 		vector<string> tokens = get_tokens(name);
 		int size = tokens.size();
@@ -252,7 +323,7 @@ bool Book::del(std::string name) {
 	switch (temp.status) {
 	case 'P':
 		if(temp.traceback) {
-			temp.traceback->next = temp.rtn->next;
+			temp.traceback = temp.rtn->volume_next;
 		}
 		temp.rtn->~volume();
 		{vector<string> tokens = get_tokens(name);
@@ -298,6 +369,9 @@ bool Book::istoken(std::string token) {
 	if(!temp) {
 		return true;
 	}
+	if(!temp->head) {
+		return true;
+	}
 	if(temp->head->index_number==-1) {
 		return false;
 	}
@@ -306,13 +380,17 @@ bool Book::istoken(std::string token) {
 
 void Book::load(){
 	index_input.open("index.dat");
-	if(index_input) {
-		index.load(index_input);
+	if(!index_input) {
+		return;
 	}
+	index.load(index_input);
 	index_input.close();
 	booklist_input.open("booklist.dat");
-
-
+	if(!booklist_input) {
+		return;
+	}
+	istream& ist = booklist_input;
+	add(ist);
 	booklist_input.close();
 }
 
@@ -332,19 +410,26 @@ void Book::save() {
 	index.save(index_output);
 	index_output.close();
 	booklist_output.open("booklist.dat");
+	if(!booklist_output) {
+		throw runtime_error("Book::save: cannot open 'booklist.dat' for writing!");
+	}
 	if(booklist.head) {
 		volume* current = booklist.head;
 		while(true) {
-			cout << current->index_number << ' ';
+			booklist_output << current->index_number << ' ';
 			if(current->fixed_index) {
-				cout << "t ";
+				booklist_output << "t ";
 			}else {
-				cout << "f ";
+				booklist_output << "f ";
 			}
-			cout << current->name << ' ';
-			if(!current->next) {
+			booklist_output << current->name;
+			if(!current->volume_next) {
 				break;
 			}
+			else {
+				booklist_output << '\n';
+			}
+			current = current->volume_next;
 		}
 	}
 	booklist_output.close();
@@ -357,14 +442,14 @@ void Book::save_loop(ofstream& ofs, node* current) {
 		item* book = current->head;
 		do {
 			cout << book->index_number << '\0';
-		} while (book->next);
+		} while (book->next_item);
 		cout << book->index_number;
 		cout << "\0}\0";
 	}
 	for(unsigned char i=0; i<CharNum; i++) {
-		if(current->next[i]) {
+		if(current->next_item[i]) {
 			cout << reinterpret_cast<char&>(i);
-			save_loop(ofs, current->next[i]);
+			save_loop(ofs, current->next_item[i]);
 		}
 	}
 }*/
@@ -377,6 +462,9 @@ void print_tokens_loop(node* current, string token) {
 		}
 	}
 	for(unsigned i=0; i<CharNum; i++) {
+		if(!current->next) {
+			return;
+		}
 		if(current->next[i]) {
 			token.push_back(reinterpret_cast<char&>(i));
 			print_tokens_loop(current->next[i], token);

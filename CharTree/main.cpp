@@ -6,9 +6,11 @@ int main() {
 	std::string s = "HELLO!";
 	test.add(s);
 	test.print_tokens();
+
 	test.save();
-	test.del(s);
+//	test.del(s);
 	system("pause");
+//	test.save();
 	return 0;
 }
 

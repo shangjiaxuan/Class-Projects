@@ -155,14 +155,14 @@
   <ItemGroup>
     <ClCompile Include="CharTree.cpp" />
     <ClCompile Include="Booklist.cpp" />
-    <ClCompile Include="index.cpp" />
+    <ClCompile Include="UI.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CharTree.h" />
     <ClInclude Include="Booklist.h" />
     <ClInclude Include="Header.h" />
-    <ClInclude Include="index.h" />
+    <ClInclude Include="UI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
