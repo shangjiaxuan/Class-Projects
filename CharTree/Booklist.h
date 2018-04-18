@@ -109,5 +109,4 @@ public:
 //先简单地写一个表，肯定不完整，以后用户可以调用函数添加（同时删除原有链表）
 	std::vector<std::string> default_non_tokens{"THE","AM","IS","ARE","OF","AT","TO","UNDER","ABOVE"};
 
-	void print_tokens();
 };

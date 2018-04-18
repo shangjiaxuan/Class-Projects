@@ -54,4 +54,7 @@ public:
 	bool node_found;
 	std::string find_node(node* target);
 	void find_node_loop(node* target, node* current, std::string& token);
+
+	void print_tokens();
+	void print_tokens_loop(node* current, std::string& token);
 };

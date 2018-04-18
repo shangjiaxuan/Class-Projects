@@ -455,25 +455,4 @@ void Book::save_loop(ofstream& ofs, node* current) {
 }*/
 
 
-void print_tokens_loop(node* current, string token) {
-	if(current->head) {
-		if (current->head->index_number >= 0) {
-			cout << token << endl;
-		}
-	}
-	for(unsigned i=0; i<CharNum; i++) {
-		if(!current->next) {
-			return;
-		}
-		if(current->next[i]) {
-			token.push_back(reinterpret_cast<char&>(i));
-			print_tokens_loop(current->next[i], token);
-			token.pop_back();
-		}
-	}
-}
 
-void Book::print_tokens() {
-	string token="";
-	print_tokens_loop(const_cast<node*>(&index.head), token);
-}

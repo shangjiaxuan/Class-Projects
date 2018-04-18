@@ -5,7 +5,7 @@ int main() {
 	Book test;
 	std::string s = "HELLO!";
 	test.add(s);
-	test.print_tokens();
+	test.index.print_tokens();
 
 	test.save();
 //	test.del(s);
