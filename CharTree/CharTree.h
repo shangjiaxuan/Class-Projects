@@ -26,10 +26,52 @@ struct node {				//字符节点
 		return *&next[elem];
 	}
 	void add(int index) {
-		item* cur = new item;
-		cur->next_item = head;
-		cur->index_number = index;
-		head = cur;
+		item* added = new item;
+		added->index_number = index;
+		item* current = head;
+		item* traceback = nullptr;
+		while(current) {
+			if(current->index_number==index) {
+				throw std::runtime_error("node::add: index exists!");
+			}
+			if(current->index_number>index) {
+				if(!traceback) {
+					added->next_item = current;
+					head = added;
+					return;;
+				}
+				else {
+					added->next_item = current;
+					traceback->next_item = added;
+					return;
+				}
+			}
+			if (!current->next_item) {
+				current->next_item = added;
+				return;
+			}
+			traceback = current;
+			current = current->next_item;
+		}
+		head = added;
+	}
+	void del(int index) {
+		item* current = head;
+		item* traceback = nullptr;
+		while(current) {
+			if (current->index_number == index) {
+				traceback->next_item = current->next_item;
+				delete current;
+				current = nullptr;
+				return;
+			}
+			if(current->index_number>index||!current->next_item) {
+				throw std::runtime_error("node::del: cannot find specified index!");
+			}
+			traceback = current;
+			current = current->next_item;
+		}
+		throw std::runtime_error("node::del: no booklist exists for specified token!");
 	}
 };
 

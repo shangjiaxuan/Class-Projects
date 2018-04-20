@@ -2,10 +2,22 @@
 
 using namespace std;
 
+void UI::ignore_space(std::istream& ist) {
+	char c;
+	ist.get(c);
+	while(c==' ') {
+		ist.get(c);
+	}
+	ist.putback(c);
+}
+
+
+
 void UI::UI_main() {
 	string cmd;
 	cout << "Please enter a command:" << endl;
 	cin >> cmd;
+	ignore_space(cin);
 	if(cmd=="add") {
 		add();
 	}
@@ -17,6 +29,13 @@ void UI::UI_main() {
 	}
 	else if(cmd=="exit") {
 		on = false;
+	}
+	else if(cmd=="ntoken") {
+		cin >> cmd;
+		ntoken(cmd);
+	}
+	else {
+		throw runtime_error("UI::UI_main: unknown command!");
 	}
 }
 
@@ -91,23 +110,65 @@ void UI::del_string(std::string line) {
 }
 
 void UI::list() {
-	
+	string cmd;
+	cin >> cmd;
+	ignore_space(cin);
+	if(cmd=="book") {
+		list_book();
+	}
+	else if(cmd=="index") {
+		list_index();
+	}
 }
 
 void UI::list_book() {
-	
+	char c;
+	cin >> c;
+	if(c=='>') {
+		ofstream ofs;
+		string s;
+		ignore_space(cin);
+		cin >> s;
+		ofs.open(s);
+		if(!ofs) {
+			throw runtime_error("UI::list_book: cannot open file for output!");
+		}
+		list_book_stream(ofs);
+		ofs.close();
+	}
+	else {
+		list_book_stream(cout);
+	}
 }
 
 void UI::list_index() {
-	
+	char c;
+	cin >> c;
+	if (c == '>') {
+		ofstream ofs;
+		string s;
+		ignore_space(cin);
+		cin >> s;
+		ofs.open(s);
+		if (!ofs) {
+			throw runtime_error("UI::list_index: cannot open file for output!");
+		}
+		list_index_stream(ofs);
+		ofs.close();
+	}
+	else {
+		list_index_stream(cout);
+	}
 }
 
-void UI::list_stream(std::ostream& ost) {
-	
+void UI::list_book_stream(std::ostream& ost) {
+	ost << "The following is the information of all the books in repository:\n" << endl;
+	base.print_booklist(ost);
 }
 
-void UI::list_string(std::string line) {
-	
+void UI::list_index_stream(std::ostream& ost) {
+	ost << "The following are all the indexes in repository:\n" << endl;
+	base.print_index(ost);
 }
 
 string UI::parse_bookname(string line) {

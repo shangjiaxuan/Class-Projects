@@ -122,7 +122,7 @@ int list::add(int index, std::string name) {
 	if (index<0) {
 		fixed = false;
 		found = find(name);
-		index = default_index();
+		index = found.default_index;
 	}
 	else {
 		fixed = true;
@@ -130,7 +130,17 @@ int list::add(int index, std::string name) {
 	}
 	switch(found.status) {
 	case 'P':
-		throw runtime_error("list::add: the specified index (or book name if no index specified) exists!");
+	{
+		if (found.rtn->fixed_index) {
+			throw runtime_error("list::add: the specified index (or book name if no index specified) exists!");
+		}
+		volume* added = new volume;
+		added->name = name;
+		added->index_number = index;
+		added->fixed_index = fixed;
+		reindex(found, added);
+		break;
+	}
 	case 'N':
 		add_head(index, name, fixed);
 		break;
@@ -189,6 +199,7 @@ void list::add(volume* previous, int index, std::string name, bool index_type) {
 	previous->volume_next = current;
 }
 
+/*
 int list::default_index() {
 	volume* current = head;
 	int index = 0;
@@ -201,18 +212,91 @@ int list::default_index() {
 	}
 	return index;
 }
+*/
 
-int list::reindex(int new_fixed) {
-	found found = find(new_fixed);
-	switch(found.status) {
-	case 'P':
-
+volume* list::find_default() {
+	volume* traceback = nullptr;
+	volume* current = head;
+	int index = 0;
+	while (current) {
+		if (current->index_number>index) {
+			return traceback;
+		}
+		current = current->volume_next;
+		index++;
 	}
-//	int new_index = found.index;
+	return traceback;
 }
 
+int list::reindex(found original, volume* added) {
+	if(original.status!='P') {
+		throw runtime_error("list::reindex(found): original book not found!");
+	}
+	original.traceback->volume_next = added;
+	added->volume_next = original.rtn->volume_next;
+	volume* default_location = find_default();
+	if(!default_location) {
+		throw runtime_error("list::reindex: list cannot be empty!");
+	}
+	original.rtn->volume_next = default_location->volume_next;
+	default_location->volume_next = original.rtn;
+	original.rtn->index_number = default_location->index_number + 1;
+	return original.rtn->index_number;
+}
 
+int list::del(string name) {
+	volume* current = head;
+	volume* traceback = nullptr;
+	int index;
+	while(current) {
+		if(current->name==name) {
+			index = current->index_number;
+			if(!traceback) {
+				delete head;
+				head = nullptr;
+			}
+			else {
+				traceback->volume_next = current->volume_next;
+				current->volume_next = nullptr;
+				delete current;
+				current = nullptr;
+			}
+			return index;
+		}
+		if(!current->volume_next) {
+			throw runtime_error("list::del: bookname not found!");
+		}
+		current = current->volume_next;
+	}
+	throw runtime_error("list::del list is empty!");
+}
 
+std::string list::del(int index) {
+	volume* current = head;
+	volume* traceback = nullptr;
+	string name;
+	while (current) {
+		if (current->index_number == index) {
+			name = current->name;
+			if (!traceback) {
+				delete head;
+				head = nullptr;
+			}
+			else {
+				traceback->volume_next = current->volume_next;
+				current->volume_next = nullptr;
+				delete current;
+				current = nullptr;
+			}
+			return name;
+		}
+		if (current->index_number>index || !current->volume_next) {
+			throw runtime_error("list::del: index not found!");
+		}
+		current = current->volume_next;
+	}
+	throw runtime_error("list::del list is empty!");
+}
 
 
 void Book::init_ntoken() {
@@ -226,6 +310,20 @@ void Book::init_ntoken() {
 	}
 }
 
+void Book::reindex(list::found original, volume* new_book) {
+	int new_index = booklist.reindex(original, new_book);
+	if (original.name == "") {
+		throw runtime_error("Book::reindex: Empty bookname!");
+	}
+	vector<string> tokens = get_tokens(original.name);
+	int size = tokens.size();
+	for(int i=0; i<size; i++) {
+		node* token_loc = index.locate(tokens[i]);
+		token_loc->add(new_index);
+	}
+}
+
+/*
 volume* Book::reindex(list::found original) {
 	const int oindex = original.rtn->index_number;
 	volume* traceback= original.rtn;
@@ -261,6 +359,7 @@ volume* Book::reindex(list::found original) {
 	}
 	return original.traceback;
 }
+*/
 
 void Book::add(istream& ist) {
 	string start;
@@ -286,6 +385,8 @@ void Book::add(istream& ist) {
 			case 'f':
 				add(bookname);
 				break;
+			default:
+				throw runtime_error("Book::add: unknown fixed status!");
 			}
 //			ist.ignore(numeric_limits<streamsize>::max(), '\n');
 		}
@@ -414,9 +515,19 @@ void Book::add(int index, std::string name) {
 }*/
 
 bool Book::del(int deleted_index) {
-	list::found temp = booklist.find(deleted_index);
+	try {
+		string name = booklist.del(deleted_index);
+		del_book_tree(name, deleted_index);
+	}
+	catch (exception& e) {
+		cerr << e.what();
+		return false;
+	}
+	return true;
+/*	list::found temp = booklist.find(deleted_index);
 	switch(temp.status) {
 	case 'P':
+
 		if (temp.traceback) {
 			temp.traceback = temp.rtn->volume_next;
 			temp.rtn->volume_next = nullptr;
@@ -439,10 +550,21 @@ bool Book::del(int deleted_index) {
 	default:
 		throw runtime_error("del(int): Unknown status!");
 	}
+	*/
 }
 
 bool Book::del(std::string name) {
 	To_standard(name);
+	try {
+		int index = del(name);
+		del_book_tree(name, index);
+	}
+	catch(exception& e) {
+		cerr << e.what();
+		return  false;
+	}
+	return true;
+/*
 	list::found temp = booklist.find(name);
 	switch (temp.status) {
 	case 'P':
@@ -463,6 +585,7 @@ bool Book::del(std::string name) {
 	default:
 		throw runtime_error("del(string): Unknown status!");
 	}
+*/
 }
 
 
@@ -571,7 +694,17 @@ void Book::del_book_tree(std::string bookname, int book_index) {
 	vector<string> tokens = get_tokens(bookname);
 	int size = tokens.size();
 	for (int i = 0; i<size; i++) {
-		index.del_token(tokens[i])->del(book_index);
+		node* node = index.locate(tokens[i]);
+		item* list = node->head;
+		if(!list) {
+			index.del_token(tokens[i]);
+			continue;
+		}
+		if(!list->next_item&&list->index_number==book_index) {
+			index.del_token(tokens[i]);
+			continue;
+		}
+		node->del(book_index);
 	}
 }
 

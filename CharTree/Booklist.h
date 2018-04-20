@@ -38,19 +38,22 @@ class list {
 		}
 	}
 	friend Book;
+	struct found;
 	volume* head;
 	int add(std::string name);
 	int add(int index, std::string name);
-//	void add_head(std::string name);
-//	void add_head(int index, std::string name);
 	void add_head(int index, std::string name, bool fixed);
-//	void change_head(std::string name);
-//	void change_head(int index, std::string name);
 	void change_head(int index, std::string name, bool fixed);
-	int default_index();
+//	int default_index();
 	void add(volume* previous, int index, std::string name, bool index_type);
 	//return value is the reindexed default index
-	int reindex(int new_fixed);
+	int reindex(found original, volume* added);
+
+	std::string del(int index);
+	int del(std::string name);
+
+	void print(std::ostream& ost);
+
 	struct found {
 		//the status of the found item
 		//legend:
@@ -69,6 +72,7 @@ class list {
 	};
 	found find(int index);
 	found find(std::string name);
+	volume* find_default();
 };
 
 //管理所有书目的链表
@@ -108,7 +112,7 @@ public:
 //这个函数不安全，放在private里面
 //	void add(volume* previous, int index, std::string name, bool index_type);
 //reassigns a default index_number and returns the volume before the index_number
-	volume* reindex(list::found original);
+	void reindex(list::found original, volume* new_book);
 	void To_standard(std::string& bookname);
 	//为了加速，让非token对应的chartree节点的index头字符串对应一本编号
 	//“-1”的书
@@ -121,4 +125,8 @@ public:
 
 	void add_book_tree(std::string bookname, int book_index);
 	void del_book_tree(std::string bookname, int book_index);
+
+
+	void print_booklist(std::ostream& ost);
+	void print_index(std::ostream& ost);
 };

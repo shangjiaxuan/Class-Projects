@@ -25,12 +25,16 @@ public:
 
 	void list();
 	void list_book();
+	void list_book_stream(std::ostream& ost);
 	void list_index();
-	void list_stream(std::ostream& ost);
-	//base function
-	void list_string(std::string line);
+	void list_index_stream(std::ostream& ost);
+
+	//adds a string that is not considered to be a token
+	void ntoken(std::string);
 
 	std::string parse_bookname(std::string line);
 	std::string parse_path(std::string line);
+
+	void ignore_space(std::istream& ist);
 };
 
