@@ -3,35 +3,90 @@
 using namespace std;
 
 list::found list::find(int index) {
+	static int default_index;
+	int cur_index{ 0 };
 	if (!head) {
-		return { 'N', nullptr , nullptr };
+		return { 'N', nullptr , nullptr , "" , 0 };
 	}
 	if (index < head->index_number) {
-		return { 'S' , nullptr, head->volume_next };
+		return { 'S' , nullptr, head->volume_next, "", 0 };
+	}
+	if (index == head->index_number) {
+		volume* temp = head;
+		while (temp->volume_next != nullptr) {
+			if (temp->index_number == cur_index) {
+				cur_index++;
+			}
+			else {
+				default_index = cur_index;
+			}
+			temp = temp->volume_next;
+		}
+		
+		return { 'P' , head, nullptr, head->name, index };
 	}
 	volume* current = head;
 	volume* traceback = nullptr;
 	while (index > current->index_number) {
+		if(cur_index==current->index_number) {
+			cur_index++;
+		}else {
+			default_index = cur_index;
+		}
 		if (current->volume_next == nullptr) {
-			return { 'M' , current, nullptr };
+			default_index = cur_index + 1;
+			return { 'M' , current, nullptr, "", default_index };
 		}
 		traceback = current;
 		current = current->volume_next;
 	}
 	if (index == current->index_number) {
-		return { 'P' , current, traceback, current->name };
+		volume* temp = head;
+		while (temp->volume_next != nullptr) {
+			if (temp->index_number == cur_index) {
+				cur_index++;
+			}
+			else {
+				default_index = cur_index;
+			}
+			temp = temp->volume_next;
+		}
+		default_index = cur_index + 1;
+		return { 'P' , current, traceback, current->name, default_index };
 	}
-	return { 'L' , nullptr, traceback->volume_next };
+	volume* temp = head;
+	while (temp->volume_next != nullptr) {
+		if (temp->index_number == cur_index) {
+			cur_index++;
+		}
+		else {
+			default_index = cur_index;
+		}
+		temp = temp->volume_next;
+	}
+	default_index = cur_index + 1;
+	return { 'L' , nullptr, traceback->volume_next, "", default_index };
 }
 
 list::found list::find(std::string name) {
 	if (!head) {
-		return { 'N', nullptr , nullptr };
+		return { 'N', nullptr , nullptr, "", 0 };
 	}
+	static int index;
+	int cur_index = 0;
 	volume* current = head;
 	volume* traceback = nullptr;
 	if (head->name != name) {
+		if(head->index_number>0) {
+			index = 0;
+		}
 		while (current->volume_next != nullptr) {
+			if (current->index_number == cur_index) {
+				cur_index++;
+			}
+			else {
+				index = cur_index;
+			}
 			traceback = current;
 			current = current->volume_next;
 			if (current->name == name) {
@@ -39,10 +94,90 @@ list::found list::find(std::string name) {
 			}
 		}
 	}
-	if (current->name == name) {
-		return { 'P' , current, traceback, current->name };
+	volume* temp = current;
+	while (temp->volume_next != nullptr) {
+		if (temp->index_number == cur_index) {
+			cur_index++;
+		}
+		else {
+			index = cur_index;
+		}
+		temp = temp->volume_next;
 	}
-	return { 'X' , nullptr , nullptr };
+	index = cur_index + 1;
+	if (current->name == name) {
+		return { 'P' , current, traceback, name, index };
+	}
+	return { 'X' , nullptr , nullptr, name, index };
+}
+
+
+int list::add(std::string name) {
+	return add(-1, name);
+}
+
+int list::add(int index, std::string name) {
+	found found;
+	bool fixed;
+	if (index<0) {
+		fixed = false;
+		found = find(name);
+		index = default_index();
+	}
+	else {
+		fixed = true;
+		found = find(index);
+	}
+	switch(found.status) {
+	case 'P':
+		throw runtime_error("list::add: the specified index (or book name if no index specified) exists!");
+	case 'N':
+		add_head(index, name, fixed);
+		break;
+	case 'S':
+		change_head(index, name, fixed);
+		break;
+	case 'L': case 'M':
+		add(found.rtn, index, name, fixed);
+		break;
+	default:
+		throw runtime_error("list::add: unknown status!");
+	}
+	return index;
+}
+
+
+//void list::add_head(int index, std::string name) {
+//	add_head(index, name, true);
+//}
+
+//void list::add_head(std::string name) {
+//	add_head(default_index(), name, false);
+//}
+
+void list::add_head(int index, std::string name, bool fixed) {
+	head = new volume;
+	head->index_number = index;
+	head->name = name;
+	head->fixed_index = fixed;
+	head->volume_next = nullptr;
+}
+
+//void list::change_head(int index, std::string name) {
+//	change_head(index, name, true);
+//}
+//
+//void list::change_head(std::string name) {
+//	change_head(default_index(), name, false);
+//}
+
+void list::change_head(int index, std::string name, bool fixed) {
+	volume* temp = head;
+	head = new volume;
+	head->name = name;
+	head->index_number = index;
+	head->volume_next = temp;
+	head->fixed_index = fixed;
 }
 
 void list::add(volume* previous, int index, std::string name, bool index_type) {
@@ -50,14 +185,32 @@ void list::add(volume* previous, int index, std::string name, bool index_type) {
 	current->index_number = index;
 	current->fixed_index = index_type;
 	current->name = name;
-	if (!previous) {
-		current->volume_next = head;
-		head = current;
-		return;
-	}
 	current->volume_next = previous->volume_next;
 	previous->volume_next = current;
 }
+
+int list::default_index() {
+	volume* current = head;
+	int index = 0;
+	while(current) {
+		if(current->index_number>index) {
+			return index;
+		}
+		current = current->volume_next;
+		index++;
+	}
+	return index;
+}
+
+int list::reindex(int new_fixed) {
+	found found = find(new_fixed);
+	switch(found.status) {
+	case 'P':
+
+	}
+//	int new_index = found.index;
+}
+
 
 
 
@@ -128,21 +281,11 @@ void Book::add(istream& ist) {
 			getline(ist, bookname);
 			switch (id) {
 			case 't':
-			{
-				bool success = add(index, bookname);
-				if (!success) {
-					throw runtime_error("Book::add: fixed index exists!");
-				}
+				add(index, bookname);
 				break;
-			}
 			case 'f':
-			{
-				bool success = add(bookname);
-				if (!success) {
-					throw runtime_error("Book::add: bookname exists!");
-				}
+				add(bookname);
 				break;
-			}
 			}
 //			ist.ignore(numeric_limits<streamsize>::max(), '\n');
 		}
@@ -150,58 +293,36 @@ void Book::add(istream& ist) {
 			string following;
 			getline(ist, following);
 			start += following;
-			bool success = add(start);
-			if(!success) {
-				throw runtime_error("Book::add: bookname exists!");
-			}
+			add(start);
 		}
 	}
 }
 
+void Book::add(string name) {
+	int index = booklist.add(name);
+	add_book_tree(name, index);
+}
 
-bool Book::add(std::string name) {
+void Book::add(int index, std::string name) {
+	booklist.add(index, name);
+	add_book_tree(name, index);
+}
+
+/*bool Book::add(std::string name) {
 	To_standard(name);
 	list::found temp = booklist.find(name);
 	switch (temp.status) {
 	case 'P':
 		return false;
 	case 'N':
-		booklist.head = new volume;
-		booklist.head->name = name;
-		booklist.head->fixed_index = false;
-		booklist.head->index_number = 0;
-		booklist.head->volume_next = nullptr;
-		{vector<string> tokens = get_tokens(name);
-		int size = tokens.size();
-		for (int i = 0; i < size; i++) {
-			this->index.add_token(tokens[i])->add(0);
-		}
-		}
+		booklist.add_head(name);
+		add_book_tree(name, 0);
 		return true;
 	case 'X':
 	{
-//		if(!booklist.head) {
-//			volume* add = new volume;
-//			add->volume_next = booklist.head;
-//			add->index_number = 0;
-//			add->name = name;
-//			add->fixed_index = false;
-//			booklist.head = add;
-//		}
-
 		if (booklist.head->index_number > 0) {
-			volume* add = new volume;
-			add->volume_next = booklist.head;
-			add->index_number = 0;
-			add->name = name;
-			add->fixed_index = false;
-			booklist.head = add;
-			{vector<string> tokens = get_tokens(name);
-			int s = tokens.size();
-			for (int i = 0; i < s; i++) {
-				this->index.add_token(tokens[i])->add(0);
-			}
-			}
+			booklist.change_head(0, name);
+			add_book_tree(name, 0);
 			return true;
 		}
 		int index = 0;
@@ -213,12 +334,7 @@ bool Book::add(std::string name) {
 			index++;
 		}
 		if(track==nullptr) {
-			booklist.head = new volume;
-			booklist.head->name = name;
-			booklist.head->fixed_index = false;
-			booklist.head->index_number = 0;
-			booklist.head->volume_next = nullptr;
-
+			booklist.add_head(name);
 		}
 		else {
 			booklist.add(track, index, name, false);
@@ -236,9 +352,9 @@ bool Book::add(std::string name) {
 		throw std::runtime_error("Book::add: Unkown found status!");
 	}
 	}
-}
+}*/
 
-bool Book::add(int index, std::string name) {
+/*bool Book::add(int index, std::string name) {
 	To_standard(name);
 	list::found temp = booklist.find(index);
 	switch(temp.status) {
@@ -295,10 +411,10 @@ bool Book::add(int index, std::string name) {
 		throw runtime_error("add(int): Unkown found status!");
 	}
 	}
-}
+}*/
 
-bool Book::del(int index) {
-	list::found temp = booklist.find(index);
+bool Book::del(int deleted_index) {
+	list::found temp = booklist.find(deleted_index);
 	switch(temp.status) {
 	case 'P':
 		if (temp.traceback) {
@@ -314,7 +430,7 @@ bool Book::del(int index) {
 		vector<string> tokens = get_tokens(name);
 		int size = tokens.size();
 		for (int i = 0; i<size; i++) {
-			this->index.del_token(tokens[i]);
+			index.del_token(tokens[i]);
 		}
 		}
 		return true;
@@ -337,7 +453,7 @@ bool Book::del(std::string name) {
 		{vector<string> tokens = get_tokens(name);
 		int size = tokens.size();
 		for(int i=0; i<size; i++) {
-			this->index.del_token(tokens[i]);
+			index.del_token(tokens[i]);
 		}
 		}
 		temp.rtn = nullptr;
@@ -443,24 +559,20 @@ void Book::save() {
 	booklist_output.close();
 }
 
-/*
-void Book::save_loop(ofstream& ofs, node* current) {
-	if (current->head) {
-		cout << "\0{\0";
-		item* book = current->head;
-		do {
-			cout << book->index_number << '\0';
-		} while (book->next_item);
-		cout << book->index_number;
-		cout << "\0}\0";
+void Book::add_book_tree(std::string bookname, int book_index) {
+	vector<string> tokens = get_tokens(bookname);
+	int size = tokens.size();
+	for (int i = 0; i<size; i++) {
+		index.add_token(tokens[i])->add(book_index);
 	}
-	for(unsigned char i=0; i<CharNum; i++) {
-		if(current->next_item[i]) {
-			cout << reinterpret_cast<char&>(i);
-			save_loop(ofs, current->next_item[i]);
-		}
-	}
-}*/
+}
 
+void Book::del_book_tree(std::string bookname, int book_index) {
+	vector<string> tokens = get_tokens(bookname);
+	int size = tokens.size();
+	for (int i = 0; i<size; i++) {
+		index.del_token(tokens[i])->del(book_index);
+	}
+}
 
 

@@ -15,11 +15,13 @@ int main_ori() {
 	return 0;
 }
 
+
+UI This;
+
 int main(int argc, char* argv[]) {
-	UI This;
-	while(true) {
+	while(This.on) {
 		This.UI_main();
 	}
-
+	return 0;
 }
 

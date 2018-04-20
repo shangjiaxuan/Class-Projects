@@ -7,7 +7,7 @@
 struct item {
 	~item() {
 		if(next_item){
-			next_item->~item();
+//			next_item->~item();
 			delete next_item;
 			next_item = nullptr;
 		}

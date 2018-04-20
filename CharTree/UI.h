@@ -6,6 +6,7 @@ class UI {
 public:
 	void UI_main();
 //private:
+	bool on;
 	Book base;
 
 	void add();

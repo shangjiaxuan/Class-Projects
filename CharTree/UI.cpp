@@ -15,6 +15,9 @@ void UI::UI_main() {
 	else if(cmd=="list") {
 		list();
 	}
+	else if(cmd=="exit") {
+		on = false;
+	}
 }
 
 void UI::add() {
@@ -24,33 +27,6 @@ void UI::add() {
 		return;
 	}
 	add_manual(cmd);
-}
-
-string UI::parse_path(string line) {
-	string path;
-	istringstream iss(line);
-	char current;
-	iss.get(current);
-	while(current==' ') {
-		iss.get(current);
-	}
-	iss.putback(current);
-	while(iss) {
-		iss.get(current);
-		switch(current) {
-		case '\"':
-			iss.get(current);
-			while(current!='\"') {
-				path.push_back(current);
-				iss.get(current);
-			}
-			break;
-		default:
-			path.push_back(current);
-			iss.get(current);
-		}
-	}
-	return path;
 }
 
 bool UI::add_file(string cmd) {
@@ -78,20 +54,6 @@ void UI::add_stream(istream& ist) {
 			add_string(cmd);
 		}
 	}
-}
-
-string UI::parse_bookname(string line) {
-	istringstream iss(line);
-	string current;
-	string name("");
-	while(iss) {
-		current = "";
-		iss >> current;
-		name.append(current);
-		name.push_back(' ');
-	}
-	name.pop_back();
-	return name;
 }
 
 void UI::add_string(std::string line) {
@@ -146,4 +108,45 @@ void UI::list_stream(std::ostream& ost) {
 
 void UI::list_string(std::string line) {
 	
+}
+
+string UI::parse_bookname(string line) {
+	istringstream iss(line);
+	string current;
+	string name("");
+	while (iss) {
+		current = "";
+		iss >> current;
+		name.append(current);
+		name.push_back(' ');
+	}
+	name.pop_back();
+	return name;
+}
+
+string UI::parse_path(string line) {
+	string path;
+	istringstream iss(line);
+	char current;
+	iss.get(current);
+	while (current == ' ') {
+		iss.get(current);
+	}
+	iss.putback(current);
+	while (iss) {
+		iss.get(current);
+		switch (current) {
+		case '\"':
+			iss.get(current);
+			while (current != '\"') {
+				path.push_back(current);
+				iss.get(current);
+			}
+			break;
+		default:
+			path.push_back(current);
+			iss.get(current);
+		}
+	}
+	return path;
 }

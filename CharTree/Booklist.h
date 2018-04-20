@@ -5,7 +5,6 @@
 
 class Book;
 class list;
-class CharTree;
 
 //所有书目中一本书对应的链表节点
 struct volume {
@@ -40,7 +39,18 @@ class list {
 	}
 	friend Book;
 	volume* head;
+	int add(std::string name);
+	int add(int index, std::string name);
+//	void add_head(std::string name);
+//	void add_head(int index, std::string name);
+	void add_head(int index, std::string name, bool fixed);
+//	void change_head(std::string name);
+//	void change_head(int index, std::string name);
+	void change_head(int index, std::string name, bool fixed);
+	int default_index();
 	void add(volume* previous, int index, std::string name, bool index_type);
+	//return value is the reindexed default index
+	int reindex(int new_fixed);
 	struct found {
 		//the status of the found item
 		//legend:
@@ -54,6 +64,8 @@ class list {
 		volume* rtn;
 		volume* traceback;
 		std::string name;
+		//the default index for new item
+		int default_index;
 	};
 	found find(int index);
 	found find(std::string name);
@@ -79,9 +91,9 @@ public:
 	//the current book using the index_number is not assigned as fixed, will return true
 	//and call the corresponding functions to fix the linked list in the index_number
 	//(what really matters)
-	bool add(int index, std::string name);
+	void add(int index, std::string name);
 	//if false, the name's already taken.
-	bool add(std::string name);
+	void add(std::string name);
 	void add(std::istream& ist);
 	bool del(int index);
 	bool del(std::string name);
@@ -107,4 +119,6 @@ public:
 //先简单地写一个表，肯定不完整，以后用户可以调用函数添加（同时删除原有链表）
 	std::vector<std::string> default_non_tokens{"THE","AM","IS","ARE","OF","AT","TO","UNDER","ABOVE"};
 
+	void add_book_tree(std::string bookname, int book_index);
+	void del_book_tree(std::string bookname, int book_index);
 };
