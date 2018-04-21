@@ -32,7 +32,7 @@ void UI::UI_main() {
 	}
 	else if(cmd=="ntoken") {
 		cin >> cmd;
-		ntoken(cmd);
+		base.ntoken(cmd);
 	}
 	else {
 		throw runtime_error("UI::UI_main: unknown command!");
@@ -90,23 +90,51 @@ void UI::add_string(std::string line) {
 }
 
 void UI::del() {
-	
+	string cmd;
+	getline(cin, cmd);
+	if(del_file(cmd)) {
+		return;
+	}
+	del_manual(cmd);
 }
 
-void UI::del_file() {
-	
+bool UI::del_file(std::string cmd) {
+	ifstream ifs;
+	string path = parse_path(cmd);
+	ifs.open(path);
+	if (ifs) {
+		del_stream(ifs);
+		ifs.close();
+		return true;
+	}
+	return false;
 }
 
-void UI::del_manual() {
-	
+void UI::del_manual(std::string cmd) {
+	cout << "Deleting book " << cmd << endl;
+	del_string(cmd);
 }
 
 void UI::del_stream(std::istream& ist) {
-	
+	string cmd;
+	while (!ist.eof()) {
+		getline(ist, cmd);
+		if (cmd != "") {
+			del_string(cmd);
+		}
+	}
 }
 
+//为了用户操作简便，目前不支持数字开头的书名
 void UI::del_string(std::string line) {
-	
+	istringstream iss(line);
+	int index; string name;
+	if (iss >> index) {
+		base.del(index);
+		return;
+	}
+	name = parse_bookname(line);
+	base.del(name);
 }
 
 void UI::list() {

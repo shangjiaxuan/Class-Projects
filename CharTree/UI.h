@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Booklist.h"
+#include "Book.h"
 
 class UI {
 public:
@@ -17,8 +17,8 @@ public:
 	void add_string(std::string line);
 
 	void del();
-	void del_manual();
-	void del_file();
+	void del_manual(std::string cmd);
+	bool del_file(std::string cmd);
 	void del_stream(std::istream& ist);
 	//base function
 	void del_string(std::string line);
@@ -30,8 +30,6 @@ public:
 	void list_index_stream(std::ostream& ost);
 
 	//adds a string that is not considered to be a token
-	void ntoken(std::string);
-
 	std::string parse_bookname(std::string line);
 	std::string parse_path(std::string line);
 

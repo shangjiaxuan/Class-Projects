@@ -18,10 +18,14 @@ int main_ori() {
 
 UI This;
 
-int main(int argc, char* argv[]) {
+int final_main(int argc, char* argv[]) {
 	while(This.on) {
 		This.UI_main();
 	}
 	return 0;
 }
 
+int main() {
+	This.add();
+	return 0;
+}

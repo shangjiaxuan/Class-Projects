@@ -153,12 +153,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Book.cpp" />
     <ClCompile Include="CharTree.cpp" />
     <ClCompile Include="Booklist.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Book.h" />
     <ClInclude Include="CharTree.h" />
     <ClInclude Include="Booklist.h" />
     <ClInclude Include="Header.h" />

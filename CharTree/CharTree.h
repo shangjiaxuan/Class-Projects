@@ -16,16 +16,37 @@ struct item {
 	item* next_item{ nullptr };
 };
 
+
+class index_list {
+	public:
+	index_list() {
+		head = nullptr;
+	}
+	~index_list() {
+		delete head;
+		head = nullptr;
+	}
+	item* head;
+	void add(int index);
+	void del(int index);
+	void print_index(std::ostream& ost);
+	void load_index(std::ifstream& ifs);
+	operator bool(){
+		return head;
+	}
+};
+
 struct node {				//字符节点
 	node();
 	~node();
 	node** next;
-	item* head;
+	index_list list;
+//	item* head;
 	//以后考虑改写代码好看些试试
 	node*& operator [] (size_t elem) {
 		return *&next[elem];
 	}
-	void add(int index) {
+/*	void add(int index) {
 		item* added = new item;
 		added->index_number = index;
 		item* current = head;
@@ -72,7 +93,7 @@ struct node {				//字符节点
 			current = current->next_item;
 		}
 		throw std::runtime_error("node::del: no booklist exists for specified token!");
-	}
+	}*/
 };
 
 
@@ -82,7 +103,7 @@ public:
 //	~CharTree();
 	const node head;
 	node* locate(std::string token);
-	item* access(std::string token);
+	index_list access(std::string token);
 	node* add_token(std::string token);
 	bool one_succ(node** list);
 	bool del_token(std::string token);
@@ -91,12 +112,12 @@ public:
 	void load(std::ifstream& ifs);
 	void load_loop(node* current, std::ifstream& ifs);
 	void load_loop_start(std::ifstream& ifs);
-	void item_list(node* current, std::ifstream& ifs);
+	void load_item_list(node* current, std::ifstream& ifs);
 
 	bool node_found;
 	std::string find_node(node* target);
 	void find_node_loop(node* target, node* current, std::string& token);
 
-	void print_tokens();
-	void print_tokens_loop(node* current, std::string& token);
+	void print_tokens(std::ostream& ost);
+	void print_tokens_loop(node* current, std::string& token, std::ostream& ost);
 };

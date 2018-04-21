@@ -5,7 +5,7 @@ using namespace std;
 
 node::node() {
 	next = nullptr;
-	head = nullptr;
+//	head = nullptr;
 }
 
 node::~node() {
@@ -20,10 +20,10 @@ node::~node() {
 		delete[] next;
 		next = nullptr;
 	}
-	if(head) {
-		delete head;
-		head = nullptr;
-	}
+//	if(head) {
+//		delete head;
+//		head = nullptr;
+//	}
 }
 
 node* CharTree::locate(std::string token) {
@@ -44,8 +44,9 @@ node* CharTree::locate(std::string token) {
 	return current;
 }
 
-item* CharTree::access(std::string token) {
-	return locate(token)->head;
+index_list CharTree::access(std::string token) {
+	return locate(token)->list;
+//	return locate(token)->head;
 }
 
 node* CharTree::add_token(std::string token) {
@@ -59,7 +60,7 @@ node* CharTree::add_token(std::string token) {
 			for (int i = 0; i < CharNum; i++) {
 				current->next[i] = nullptr;
 			}
-			current->head = nullptr;
+//			current->head = nullptr;
 		}
 		if(current->next[loc]!=nullptr) {
 			current = current->next[loc];
@@ -135,17 +136,12 @@ void CharTree::save(ofstream& ofs) {
 
 void CharTree::save_loop(node* current, ofstream& ofs) {
 	char char_buffer;
-	if (current->head) {
-		if (current->head->index_number<0) {
+	if (current->list.head) {
+		if (current->list.head->index_number<0) {
 			return;
 		}
 		ofs << '{';
-		item* label = current->head;
-		ofs << label->index_number << ' ';
-		while (label->next_item) {
-			label = label->next_item;
-			ofs << label->index_number << ' ';
-		}
+		current->list.print_index(ofs);
 		ofs << '}';
 	}
 	if (!current->next) {
@@ -168,7 +164,7 @@ void CharTree::load(ifstream& ifs) {
 		for (int i = 0; i < CharNum; i++) {
 			start->next[i] = nullptr;
 		}
-		start->head = nullptr;
+//		start->head = nullptr;
 	}
 	load_loop_start(ifs);
 }
@@ -191,7 +187,9 @@ void CharTree::load_loop(node* current, ifstream& ifs) {
 		return;
 	} 
 	else if (temp=='{') {
-		item_list(current, ifs);
+		ifs.putback(temp);
+		current->list.load_index(ifs);
+//		load_item_list(current, ifs);
 		load_loop(current, ifs);
 		return;
 	}
@@ -201,7 +199,7 @@ void CharTree::load_loop(node* current, ifstream& ifs) {
 			for (int i = 0; i < CharNum; i++) {
 				current->next[i] = nullptr;
 			}
-			current->head = nullptr;
+//			current->head = nullptr;
 		}
 		current->next[loc] = new node;
 		load_loop(current->next[loc], ifs);
@@ -210,7 +208,7 @@ void CharTree::load_loop(node* current, ifstream& ifs) {
 /*	switch(temp) {
 		case '\t':
 			if(ifs.peek() == '{') {
-				item_list(current, ifs);
+				load_item_list(current, ifs);
 			}
 			break;
 		default:
@@ -226,10 +224,10 @@ void CharTree::load_loop(node* current, ifstream& ifs) {
 	}*/
 }
 
-void CharTree::item_list(node* current, ifstream& ifs) {
+/*void CharTree::load_item_list(node* current, ifstream& ifs) {
 	int index_number;
-	current->head = new item;
-	item* cur = current->head;
+	current->list.head = new item;
+	item* cur = current->list.head;
 	char temp;
 	ifs.get(temp);
 	while(temp != '}') {
@@ -246,11 +244,11 @@ void CharTree::item_list(node* current, ifstream& ifs) {
 			cur->next_item = nullptr;
 			break;
 		} else {
-			throw  runtime_error("CharTree::item_list: index expected!");
+			throw  runtime_error("CharTree::load_item_list: index expected!");
 		}
 	}
 	// break;
-}
+}*/
 
 void CharTree::find_node_loop(node* target, node* current, string& token) {
 	unsigned char temp;
@@ -283,10 +281,12 @@ string CharTree::find_node(node* target) {
 	return token;
 }
 
-void CharTree::print_tokens_loop(node* current, string& token) {
-	if (current->head) {
-		if (current->head->index_number >= 0) {
-			cout << token << endl;
+void CharTree::print_tokens_loop(node* current, string& token, ostream& ost) {
+	if (current->list) {
+		if (current->list.head->index_number >= 0) {
+			ost << token << ":\t";
+			current->list.print_index(ost);
+			ost << endl;
 		}
 	}
 	for (unsigned i = 0; i<CharNum; i++) {
@@ -295,13 +295,109 @@ void CharTree::print_tokens_loop(node* current, string& token) {
 		}
 		if (current->next[i]) {
 			token.push_back(reinterpret_cast<char&>(i));
-			print_tokens_loop(current->next[i], token);
+			print_tokens_loop(current->next[i], token, ost);
 			token.pop_back();
 		}
 	}
 }
 
-void CharTree::print_tokens() {
+void CharTree::print_tokens(ostream& ost) {
 	string token = "";
-	print_tokens_loop(const_cast<node*>(&(this->head)), token);
+	print_tokens_loop(const_cast<node*>(&(this->head)), token, ost);
 }
+
+
+void index_list::add(int index) {
+	item* current = head;
+	item* traceback = nullptr;
+	bool done{ false };
+	while(current) {
+		if(index<current->index_number) {
+			if(!traceback) {
+				head = new item;
+				head->index_number = index;
+				head->next_item = current;
+				done = true;
+				return;
+			}
+			item* added = new item;
+			added->next_item = current;
+			traceback->next_item = added;
+			added->index_number = index;
+			done = true;
+			return;
+		}
+		if(index==current->index_number) {
+			throw runtime_error("index_list::add: index exists!");
+		}
+		if(!current->next_item) {
+			current->next_item = new item;
+			current->next_item->index_number = index;
+			done = true;
+			return;
+		}
+		traceback = current;
+		current = current->next_item;
+	}
+	head = new item;
+	head->index_number = index;
+	done = true;
+}
+
+void index_list::del(int index) {
+	item* current = head;
+	item* traceback = nullptr;
+	bool done{ false };
+	while(current) {
+		if(index==current->index_number) {
+			current->next_item = nullptr;
+			delete current;
+			current = nullptr;
+			return;
+		}
+		if(index<current->index_number||!current->next_item) {
+			throw runtime_error("index_list::del: no such index exists!");
+		}
+		traceback = current;
+		current = current->next_item;
+	}
+	throw runtime_error("index_list::del: list is empty!");
+}
+
+void index_list::print_index(std::ostream& ost) {
+	item* current = head;
+	while(current) {
+		ost << current->index_number << ' ';
+		current = current->next_item;
+	}
+	ost << endl;
+}
+
+void index_list::load_index(std::ifstream& ifs) {
+	char c;
+	item* current = head;
+	item* traceback = nullptr;
+	ifs.get(c);
+	if(c!='{') {
+		ifs.putback(c);
+		return;
+	}
+	int index;
+	while (ifs.peek() != '}') {
+		ifs >> index;
+		if (index) {
+			traceback = current;
+			current = new item;
+			if (traceback) {
+				traceback->next_item = current;
+			}
+		}
+		else {
+			throw runtime_error("index_list::load_index: not a number");
+		}
+		current->index_number = index;
+		ifs.get();
+	}
+	ifs.get();
+}
+
