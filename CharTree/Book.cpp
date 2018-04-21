@@ -243,7 +243,7 @@ bool Book::del(int deleted_index) {
 		del_book_tree(name, deleted_index);
 	}
 	catch (exception& e) {
-		cerr << e.what();
+		cerr << e.what() << endl;
 		return false;
 	}
 	return true;
@@ -283,7 +283,7 @@ bool Book::del(std::string name) {
 		del_book_tree(name, index);
 	}
 	catch (exception& e) {
-		cerr << e.what();
+		cerr << e.what() << endl;
 		return  false;
 	}
 	return true;

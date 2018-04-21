@@ -2,6 +2,8 @@
 #include "Header.h"
 #include "Booklist.h"
 
+class UI;
+
 //管理所有书目的链表
 //貌似应该再加一个保存到文件的功能，就叫“index.dat”和“booklist.dat”罢
 //这样就不需要非token的vector了（手动输入一次，保存）
@@ -23,6 +25,8 @@ public:
 	//and call the corresponding functions to fix the linked list in the index_number
 	//(what really matters)
 
+	friend UI;
+
 	void add(int index, std::string name);
 	//if false, the name's already taken.
 	void add(std::string name);
@@ -35,7 +39,7 @@ public:
 
 	void save();
 	void load();
-	//private:
+private:
 	std::ifstream index_input;
 	std::ofstream index_output;
 	std::ifstream booklist_input;
@@ -55,9 +59,9 @@ public:
 	//先简单地写一个表，肯定不完整，以后用户可以调用函数添加（同时删除原有链表）
 	std::vector<std::string> default_non_tokens{ "THE","AM","IS","ARE","OF","AT","TO","UNDER","ABOVE" };
 
+protected:
 	void add_book_tree(std::string bookname, int book_index);
 	void del_book_tree(std::string bookname, int book_index);
-
 
 	void print_booklist(std::ostream& ost);
 	void print_index(std::ostream& ost);

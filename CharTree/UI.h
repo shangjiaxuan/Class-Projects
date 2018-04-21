@@ -5,9 +5,15 @@
 class UI {
 public:
 	void UI_main();
-//private:
+	operator bool(){
+		return on;
+	}
+private:
 	bool on{ true };
 	Book base;
+	void prompt();
+	void name_ver();
+	void parser(/*std::istream& ist*/);
 
 	void add();
 	bool add_file(std::string cmd);

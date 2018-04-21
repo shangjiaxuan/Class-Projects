@@ -2,6 +2,31 @@
 
 using namespace std;
 
+void UI::prompt() {
+	cout << "Please enter a command:......\n" << endl;
+}
+
+void UI::name_ver() {
+	cout << "Book_Index\n";
+	cout << "v0.0.0.0\n";
+	cout << "Simple book control program with key-word control.\n" << endl;
+}
+
+void UI::UI_main() {
+	name_ver();
+	while (on) {
+		try {
+			parser();
+		}
+		catch (exception& e) {
+			cerr << e.what() << endl;
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		}
+	}
+}
+
+
 void UI::ignore_space(std::istream& ist) {
 	char c;
 	ist.get(c);
@@ -11,9 +36,9 @@ void UI::ignore_space(std::istream& ist) {
 	ist.putback(c);
 }
 
-void UI::UI_main() {
+void UI::parser() {
 	string cmd;
-	cout << "Please enter a command:" << endl;
+	prompt();
 	cin >> cmd;
 	ignore_space(cin);
 	if (cmd == "exit") {
@@ -38,6 +63,7 @@ void UI::UI_main() {
 	else {
 		throw runtime_error("UI::UI_main: unknown command!");
 	}
+	cout << endl;
 }
 
 void UI::add() {
@@ -62,7 +88,7 @@ bool UI::add_file(string cmd) {
 }
 
 void UI::add_manual(string cmd) {
-	cout << "Adding book " << cmd << endl;
+	cout << "\nAdding book \"" << cmd <<"\"....."<< endl;
 	add_string(cmd);
 }
 
@@ -112,7 +138,7 @@ bool UI::del_file(std::string cmd) {
 }
 
 void UI::del_manual(std::string cmd) {
-	cout << "Deleting book " << cmd << endl;
+	cout << "\nDeleting book \"" << cmd << "\"......" << endl;
 	del_string(cmd);
 }
 
@@ -147,6 +173,8 @@ void UI::list() {
 	}
 	else if(cmd=="index") {
 		list_index();
+	} else {
+		throw runtime_error("UI::list: unknown command!");
 	}
 }
 
