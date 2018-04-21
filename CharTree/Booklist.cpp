@@ -76,8 +76,10 @@ list::found list::find(std::string name) {
 	int cur_index = 0;
 	volume* current = head;
 	volume* traceback = nullptr;
+	static volume* _default;
 	if (head->name != name) {
 		if(head->index_number>0) {
+			_default = nullptr;
 			index = 0;
 		}
 		while (current->volume_next != nullptr) {
@@ -85,6 +87,7 @@ list::found list::find(std::string name) {
 				cur_index++;
 			}
 			else {
+				_default = traceback;
 				index = cur_index;
 			}
 			traceback = current;
@@ -95,20 +98,24 @@ list::found list::find(std::string name) {
 		}
 	}
 	volume* temp = current;
+	volume* temp_default = traceback;
 	while (temp->volume_next != nullptr) {
 		if (temp->index_number == cur_index) {
 			cur_index++;
 		}
 		else {
+			_default = temp_default;
 			index = cur_index;
 		}
+		temp_default = temp;
 		temp = temp->volume_next;
 	}
+	_default = temp;
 	index = cur_index + 1;
 	if (current->name == name) {
 		return { 'P' , current, traceback, name, index };
 	}
-	return { 'X' , nullptr , nullptr, name, index };
+	return { 'X' , _default , nullptr, name, index };
 }
 
 
@@ -149,6 +156,19 @@ int list::add(int index, std::string name) {
 		break;
 	case 'L': case 'M':
 		add(found.rtn, index, name, fixed);
+		break;
+	case 'X':
+		if(!found.rtn) {
+			
+		}
+		else {
+			volume* added = new volume;
+			added->index_number = index;
+			added->fixed_index = fixed;
+			added->name = name;
+			added->volume_next = found.rtn->volume_next;
+			found.rtn->volume_next = added;
+		}
 		break;
 	default:
 		throw runtime_error("list::add: unknown status!");
@@ -299,7 +319,8 @@ std::string list::del(int index) {
 }
 
 void list::save(std::ofstream& ofs) {
-	if (head) {
+	print(ofs);
+/*	if (head) {
 		volume* current = head;
 		while (true) {
 			ofs << current->index_number << ' ';
@@ -318,7 +339,7 @@ void list::save(std::ofstream& ofs) {
 			}
 			current = current->volume_next;
 		}
-	}
+	}*/
 }
 
 void list::load(std::ifstream& ifs) {
@@ -359,4 +380,26 @@ void list::load(std::ifstream& ifs) {
 	}
 }
 
+void list::print(std::ostream& ost) {
+	if (head) {
+		volume* current = head;
+		while (true) {
+			ost << current->index_number << ' ';
+			if (current->fixed_index) {
+				ost << "t ";
+			}
+			else {
+				ost << "f ";
+			}
+			ost << current->name;
+			if (!current->volume_next) {
+				break;
+			}
+			else {
+				ost << '\n';
+			}
+			current = current->volume_next;
+		}
+	}
+}
 

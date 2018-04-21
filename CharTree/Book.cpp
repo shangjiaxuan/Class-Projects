@@ -105,11 +105,13 @@ void Book::add(istream& ist) {
 }
 
 void Book::add(string name) {
+	To_standard(name);
 	int index = booklist.add(name);
 	add_book_tree(name, index);
 }
 
 void Book::add(int index, std::string name) {
+	To_standard(name);
 	booklist.add(index, name);
 	add_book_tree(name, index);
 }
@@ -410,11 +412,11 @@ void Book::del_book_tree(std::string bookname, int book_index) {
 
 
 void Book::print_booklist(std::ostream& ost) {
-
+	booklist.print(ost);
 }
 
 void Book::print_index(std::ostream& ost) {
-
+	index.print_tokens(ost);
 }
 
 void Book::ntoken(std::string token) {

@@ -11,14 +11,15 @@ void UI::ignore_space(std::istream& ist) {
 	ist.putback(c);
 }
 
-
-
 void UI::UI_main() {
 	string cmd;
 	cout << "Please enter a command:" << endl;
 	cin >> cmd;
 	ignore_space(cin);
-	if(cmd=="add") {
+	if (cmd == "exit") {
+			on = false;
+	}
+	else if(cmd=="add") {
 		add();
 	}
 	else if(cmd=="del") {
@@ -27,12 +28,12 @@ void UI::UI_main() {
 	else if(cmd=="list") {
 		list();
 	}
-	else if(cmd=="exit") {
-		on = false;
-	}
 	else if(cmd=="ntoken") {
 		cin >> cmd;
 		base.ntoken(cmd);
+	}
+	else if(cmd=="save") {
+		base.save();
 	}
 	else {
 		throw runtime_error("UI::UI_main: unknown command!");
@@ -151,7 +152,8 @@ void UI::list() {
 
 void UI::list_book() {
 	char c;
-	cin >> c;
+	ignore_space(cin);
+	cin.get(c);
 	if(c=='>') {
 		ofstream ofs;
 		string s;
@@ -166,12 +168,14 @@ void UI::list_book() {
 	}
 	else {
 		list_book_stream(cout);
+		cout << endl;
 	}
 }
 
 void UI::list_index() {
 	char c;
-	cin >> c;
+	ignore_space(cin);
+	cin.get(c);
 	if (c == '>') {
 		ofstream ofs;
 		string s;

@@ -370,7 +370,6 @@ void index_list::print_index(std::ostream& ost) {
 		ost << current->index_number << ' ';
 		current = current->next_item;
 	}
-	ost << endl;
 }
 
 void index_list::load_index(std::ifstream& ifs) {
@@ -384,12 +383,14 @@ void index_list::load_index(std::ifstream& ifs) {
 	}
 	int index;
 	while (ifs.peek() != '}') {
-		ifs >> index;
-		if (index) {
+		if (ifs >> index) {
 			traceback = current;
 			current = new item;
 			if (traceback) {
 				traceback->next_item = current;
+			}
+			else {
+				head = current;
 			}
 		}
 		else {
