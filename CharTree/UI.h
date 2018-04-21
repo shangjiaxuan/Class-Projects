@@ -5,9 +5,6 @@
 class UI {
 public:
 	void UI_main();
-	operator bool(){
-		return on;
-	}
 private:
 	bool on{ true };
 	Book base;
