@@ -44,7 +44,7 @@ struct node {				//字符节点
 //	item* head;
 	//以后考虑改写代码好看些试试
 	node*& operator [] (size_t elem) {
-		return *&next[elem];
+		return next[elem];
 	}
 /*	void add(int index) {
 		item* added = new item;
@@ -112,7 +112,7 @@ public:
 	void load(std::ifstream& ifs);
 	void load_loop(node* current, std::ifstream& ifs);
 	void load_loop_start(std::ifstream& ifs);
-	void load_item_list(node* current, std::ifstream& ifs);
+//	void load_item_list(node* current, std::ifstream& ifs);
 
 	bool node_found;
 	std::string find_node(node* target);

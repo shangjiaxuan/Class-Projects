@@ -105,15 +105,31 @@ void Book::add(istream& ist) {
 }
 
 void Book::add(string name) {
+	if(name=="") {
+		throw runtime_error("Book::add: no bookname specified!");
+	}
 	To_standard(name);
 	int index = booklist.add(name);
 	add_book_tree(name, index);
 }
 
-void Book::add(int index, std::string name) {
+void Book::add(int added_index, std::string name) {
+	if (name == "") {
+		throw runtime_error("Book::add: no bookname specified!");
+	}
 	To_standard(name);
-	booklist.add(index, name);
-	add_book_tree(name, index);
+	list::found found = booklist.find(added_index);
+	int new_index = booklist.add(added_index, name);
+	if (found.status == 'P') {
+		vector<string> tokens = get_tokens(found.name);
+		int size = tokens.size();
+		for(int i=0; i<size; i++) {
+			node* token = index.locate(tokens[i]);
+			token->list.del(added_index);
+			token->list.add(new_index);
+		}
+	}
+	add_book_tree(name, added_index);
 }
 
 /*bool Book::add(std::string name) {

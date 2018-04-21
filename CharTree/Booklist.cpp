@@ -76,13 +76,14 @@ list::found list::find(std::string name) {
 	int cur_index = 0;
 	volume* current = head;
 	volume* traceback = nullptr;
+	bool done{ false };
 	static volume* _default;
-	if (head->name != name) {
+	if (current->name != name) {
 		if(head->index_number>0) {
 			_default = nullptr;
 			index = 0;
 		}
-		while (current->volume_next != nullptr) {
+		while (current->volume_next) {
 			if (current->index_number == cur_index) {
 				cur_index++;
 			}
@@ -93,6 +94,7 @@ list::found list::find(std::string name) {
 			traceback = current;
 			current = current->volume_next;
 			if (current->name == name) {
+				done = true;
 				break;
 			}
 		}
@@ -145,7 +147,7 @@ int list::add(int index, std::string name) {
 		added->name = name;
 		added->index_number = index;
 		added->fixed_index = fixed;
-		reindex(found, added);
+		index = reindex(found, added);
 		break;
 	}
 	case 'N':
@@ -158,18 +160,15 @@ int list::add(int index, std::string name) {
 		add(found.rtn, index, name, fixed);
 		break;
 	case 'X':
-		if(!found.rtn) {
-			
-		}
-		else {
-			volume* added = new volume;
-			added->index_number = index;
-			added->fixed_index = fixed;
-			added->name = name;
-			added->volume_next = found.rtn->volume_next;
-			found.rtn->volume_next = added;
-		}
+	{
+		volume* added = new volume;
+		added->index_number = index;
+		added->fixed_index = fixed;
+		added->name = name;
+		added->volume_next = found.rtn->volume_next;
+		found.rtn->volume_next = added;
 		break;
+	}
 	default:
 		throw runtime_error("list::add: unknown status!");
 	}
@@ -242,6 +241,7 @@ volume* list::find_default() {
 		if (current->index_number>index) {
 			return traceback;
 		}
+		traceback = current;
 		current = current->volume_next;
 		index++;
 	}
@@ -251,6 +251,27 @@ volume* list::find_default() {
 int list::reindex(found original, volume* added) {
 	if(original.status!='P') {
 		throw runtime_error("list::reindex(found): original book not found!");
+	}
+	if(!original.traceback) {
+		if(!original.rtn) {
+			throw runtime_error("list::reindex: list cannot be empty!");
+		}
+		volume* prev = find_default();
+		added->volume_next = original.rtn->volume_next;
+		head = added;
+		original.rtn->index_number = prev->index_number + 1;
+		original.rtn->volume_next = prev->volume_next;
+		prev->volume_next = original.rtn;
+		return original.rtn->index_number;
+//		if(added->index_number==0) {
+//			added->volume_next = head;
+//			head->index_number = 1;
+//			head = added;
+//			return 1;
+//		}
+//		else {
+//			throw runtime_error("list::reindex: default index for first item is not 0!");
+//		}
 	}
 	original.traceback->volume_next = added;
 	added->volume_next = original.rtn->volume_next;
@@ -272,8 +293,10 @@ int list::del(string name) {
 		if(current->name==name) {
 			index = current->index_number;
 			if(!traceback) {
+				volume* temp = head->volume_next;
+				head->volume_next = nullptr;
 				delete head;
-				head = nullptr;
+				head = temp;
 			}
 			else {
 				traceback->volume_next = current->volume_next;
@@ -299,8 +322,10 @@ std::string list::del(int index) {
 		if (current->index_number == index) {
 			name = current->name;
 			if (!traceback) {
+				volume* temp = head->volume_next;
+				head->volume_next = nullptr;
 				delete head;
-				head = nullptr;
+				head = temp;
 			}
 			else {
 				traceback->volume_next = current->volume_next;

@@ -170,58 +170,41 @@ void CharTree::load(ifstream& ifs) {
 }
 
 void CharTree::load_loop_start(std::ifstream& ifs) {
-	while(!ifs.eof()) {
+//	while(!ifs.eof()) {
 		load_loop(const_cast<node*>(&head), ifs);
-	}
+//	}
 }
 
-
 void CharTree::load_loop(node* current, ifstream& ifs) {
-	char temp;
 	if(ifs.eof()) {
 		return;
 	}
-	ifs.get(temp);
-	unsigned char loc = temp;
-	if(temp=='\t') {
-		return;
-	} 
-	else if (temp=='{') {
-		ifs.putback(temp);
-		current->list.load_index(ifs);
-//		load_item_list(current, ifs);
-		load_loop(current, ifs);
-		return;
-	}
-	else {
-		if (!current->next) {
-			current->next = new node*[CharNum];
-			for (int i = 0; i < CharNum; i++) {
-				current->next[i] = nullptr;
-			}
-//			current->head = nullptr;
+	char temp;
+	while (!ifs.eof()) {
+		ifs.get(temp);
+		unsigned char loc = temp;
+		if (temp == '\t') {
+			return;
 		}
-		current->next[loc] = new node;
-		load_loop(current->next[loc], ifs);
-		return;
-	}
-/*	switch(temp) {
-		case '\t':
-			if(ifs.peek() == '{') {
-				load_item_list(current, ifs);
-			}
-			break;
-		default:
-			if(!current->volume_next) {
-				current->volume_next = new node*[CharNum];
+		else if (temp == '{') {
+			ifs.putback(temp);
+			current->list.load_index(ifs);
+			continue;
+		}
+		else {
+			if (!current->next) {
+				current->next = new node*[CharNum];
 				for (int i = 0; i < CharNum; i++) {
-					current->volume_next[i] = nullptr;
+					current->next[i] = nullptr;
 				}
-				current->head = nullptr;
 			}
-			current->volume_next[loc] = new node;
-			load_loop(current->volume_next[loc], ifs);
-	}*/
+			if (!current->next[loc]) {
+				current->next[loc] = new node;
+			}
+			load_loop(current->next[loc], ifs);
+			continue;
+		}
+	}
 }
 
 /*void CharTree::load_item_list(node* current, ifstream& ifs) {
@@ -294,7 +277,9 @@ void CharTree::print_tokens_loop(node* current, string& token, ostream& ost) {
 			return;
 		}
 		if (current->next[i]) {
-			token.push_back(reinterpret_cast<char&>(i));
+			unsigned char c = i;
+			char ch = c;
+			token.push_back(ch);
 			print_tokens_loop(current->next[i], token, ost);
 			token.pop_back();
 		}
@@ -351,6 +336,9 @@ void index_list::del(int index) {
 	while(current) {
 		if(index==current->index_number) {
 			current->next_item = nullptr;
+			if(current==head) {
+				head = nullptr;
+			}
 			delete current;
 			current = nullptr;
 			return;
