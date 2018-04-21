@@ -76,7 +76,6 @@ list::found list::find(std::string name) {
 	int cur_index = 0;
 	volume* current = head;
 	volume* traceback = nullptr;
-	bool done{ false };
 	static volume* _default;
 	if (current->name != name) {
 		if(head->index_number>0) {
@@ -94,7 +93,6 @@ list::found list::find(std::string name) {
 			traceback = current;
 			current = current->volume_next;
 			if (current->name == name) {
-				done = true;
 				break;
 			}
 		}
@@ -302,7 +300,7 @@ int list::del(string name) {
 				traceback->volume_next = current->volume_next;
 				current->volume_next = nullptr;
 				delete current;
-				current = nullptr;
+//				current = nullptr;
 			}
 			return index;
 		}
@@ -331,7 +329,7 @@ std::string list::del(int index) {
 				traceback->volume_next = current->volume_next;
 				current->volume_next = nullptr;
 				delete current;
-				current = nullptr;
+//				current = nullptr;
 			}
 			return name;
 		}

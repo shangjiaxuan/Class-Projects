@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Header.h"
-#include "CharTree.h"
 
 class Book;
 class list;

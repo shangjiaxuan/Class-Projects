@@ -57,10 +57,9 @@ node* CharTree::add_token(std::string token) {
 		loc = token[i];
 		if(!current->next) {
 			current->next = new node*[CharNum];
-			for (int i = 0; i < CharNum; i++) {
-				current->next[i] = nullptr;
+			for (int j = 0; j < CharNum; j++) {
+				current->next[j] = nullptr;
 			}
-//			current->head = nullptr;
 		}
 		if(current->next[loc]!=nullptr) {
 			current = current->next[loc];
@@ -108,7 +107,7 @@ bool CharTree::del_token(std::string token) {
 		temp->next[loc] = nullptr;
 	}
 	delete[] remove;
-	remove = nullptr;
+//	remove = nullptr;
 	return true;
 }
 
@@ -295,21 +294,18 @@ void CharTree::print_tokens(ostream& ost) {
 void index_list::add(int index) {
 	item* current = head;
 	item* traceback = nullptr;
-	bool done{ false };
 	while(current) {
 		if(index<current->index_number) {
 			if(!traceback) {
 				head = new item;
 				head->index_number = index;
 				head->next_item = current;
-				done = true;
 				return;
 			}
 			item* added = new item;
 			added->next_item = current;
 			traceback->next_item = added;
 			added->index_number = index;
-			done = true;
 			return;
 		}
 		if(index==current->index_number) {
@@ -318,7 +314,6 @@ void index_list::add(int index) {
 		if(!current->next_item) {
 			current->next_item = new item;
 			current->next_item->index_number = index;
-			done = true;
 			return;
 		}
 		traceback = current;
@@ -326,21 +321,22 @@ void index_list::add(int index) {
 	}
 	head = new item;
 	head->index_number = index;
-	done = true;
 }
 
 void index_list::del(int index) {
 	item* current = head;
 	item* traceback = nullptr;
-	bool done{ false };
 	while(current) {
 		if(index==current->index_number) {
-			current->next_item = nullptr;
 			if(current==head) {
+				current->next_item = nullptr;
 				head = nullptr;
+			} else {
+				traceback->next_item = current->next_item;
+				current->next_item = nullptr;
 			}
 			delete current;
-			current = nullptr;
+//			current = nullptr;
 			return;
 		}
 		if(index<current->index_number||!current->next_item) {

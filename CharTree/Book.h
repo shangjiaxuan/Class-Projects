@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Header.h"
 #include "Booklist.h"
+#include "CharTree.h"
 
 class UI;
 

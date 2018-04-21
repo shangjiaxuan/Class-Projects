@@ -5,13 +5,7 @@ using namespace std;
 void Book::init_ntoken() {
 	int size = default_non_tokens.size();
 	for (int i = 0; i < size; i++) {
-		node* added = index.add_token(default_non_tokens[i]);
-
-
-		//		if(!added->head) {
-		//			added->head = new item;
-		//		}
-		//		added->head->index_number = -1;
+		index.add_token(default_non_tokens[i])->list.add(-1);
 	}
 }
 
