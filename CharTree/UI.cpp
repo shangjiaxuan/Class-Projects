@@ -1,4 +1,4 @@
-#include "UI.h"
+ï»¿#include "UI.h"
 
 using namespace std;
 
@@ -103,7 +103,7 @@ void UI::add_stream(istream& ist) {
 }
 
 void UI::add_string(std::string line) {
-	//ÓĞĞòºÅµÄ¿ÉÄÜ
+	//æœ‰åºå·çš„å¯èƒ½
 	istringstream iss(line);
 	int index; string name;
 	if(iss>>index) {
@@ -152,7 +152,7 @@ void UI::del_stream(std::istream& ist) {
 	}
 }
 
-//ÎªÁËÓÃ»§²Ù×÷¼ò±ã£¬Ä¿Ç°²»Ö§³ÖÊı×Ö¿ªÍ·µÄÊéÃû
+//ä¸ºäº†ç”¨æˆ·æ“ä½œç®€ä¾¿ï¼Œç›®å‰ä¸æ”¯æŒæ•°å­—å¼€å¤´çš„ä¹¦å
 void UI::del_string(std::string line) {
 	istringstream iss(line);
 	int index; string name;
