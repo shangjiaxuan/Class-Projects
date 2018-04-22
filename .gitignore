@@ -261,4 +261,5 @@ __pycache__/
 *.pyc
 
 #personal
-[Ii]ntermediates
+[Ii]ntermediates/
+[Bb]uild/

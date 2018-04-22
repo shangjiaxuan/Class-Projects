@@ -3,8 +3,8 @@
 using namespace std;
 
 void Book::init_ntoken() {
-	int size = default_non_tokens.size();
-	for (int i = 0; i < size; i++) {
+	size_t size = default_non_tokens.size();
+	for (size_t i = 0; i < size; i++) {
 		index.add_token(default_non_tokens[i])->list.add(-1);
 	}
 }
@@ -15,8 +15,8 @@ void Book::reindex(list::found original, volume* new_book) {
 		throw runtime_error("Book::reindex: Empty bookname!");
 	}
 	vector<string> tokens = get_tokens(original.name);
-	int size = tokens.size();
-	for (int i = 0; i<size; i++) {
+	size_t size = tokens.size();
+	for (size_t i = 0; i<size; i++) {
 		node* token_loc = index.locate(tokens[i]);
 		token_loc->list.add(new_index);
 	}
@@ -116,8 +116,8 @@ void Book::add(int added_index, std::string name) {
 	int new_index = booklist.add(added_index, name);
 	if (found.status == 'P') {
 		vector<string> tokens = get_tokens(found.name);
-		int size = tokens.size();
-		for(int i=0; i<size; i++) {
+		size_t size = tokens.size();
+		for(size_t i=0; i<size; i++) {
 			node* token = index.locate(tokens[i]);
 			token->list.del(added_index);
 			token->list.add(new_index);
@@ -308,8 +308,8 @@ bool Book::del(std::string name) {
 
 //有大写又有小写的规范很复杂，要考虑词的性质和长度，还有“I”一类的词，干脆英文全大写（尽管完全和词相关，和位置关系不大（除了第一个词））
 void Book::To_standard(std::string& bookname) {
-	const int size = bookname.size();
-	for (int i = 0; i<size; i++) {
+	const size_t size = bookname.size();
+	for (size_t i = 0; i<size; i++) {
 		if (bookname[i]>96 && bookname[i]<123) {
 			bookname[i] -= 32;
 		}
@@ -401,16 +401,16 @@ void Book::save() {
 
 void Book::add_book_tree(std::string bookname, int book_index) {
 	vector<string> tokens = get_tokens(bookname);
-	int size = tokens.size();
-	for (int i = 0; i<size; i++) {
+	size_t size = tokens.size();
+	for (size_t i = 0; i<size; i++) {
 		index.add_token(tokens[i])->list.add(book_index);
 	}
 }
 
 void Book::del_book_tree(std::string bookname, int book_index) {
 	vector<string> tokens = get_tokens(bookname);
-	int size = tokens.size();
-	for (int i = 0; i<size; i++) {
+	size_t size = tokens.size();
+	for (size_t i = 0; i<size; i++) {
 		node* node = index.locate(tokens[i]);
 		if (!node->list || ((!node->list.head->next_item) && node->list.head->index_number == book_index)) {
 			index.del_token(tokens[i]);
@@ -440,3 +440,56 @@ void Book::ntoken(std::string token) {
 	}
 	index.add_token(token)->list.add(-1);
 }
+
+void list::print_book(int index, std::ostream& ost) {
+	found found = find(index);
+	if (found.status != 'P') {
+		throw runtime_error("list::print_book: index not found!");
+	}
+	print_book(found.rtn, ost);
+}
+
+void list::print_book(std::string name, std::ostream& ost) {
+	found found = find(name);
+	if(found.status!='P') {
+		throw runtime_error("list::print_book: name not found!");
+	}
+	print_book(found.rtn, ost);
+}
+
+void list::print_book(volume* book, std::ostream& ost) {
+	if (book->fixed_index) {
+		ost << "index:\t" << book->index_number << '\n';
+	}
+	ost << "name:\t" << book->name << endl;
+}
+
+void Book::print_token(std::string token, std::ostream& ost) {
+	//必须这么写，否则会被析构
+	index_list& list = index.access(token);
+//	item* list_head = index.access(token).head;
+	if(!list) {
+		throw runtime_error("Book::print_token: book list with given token is empty");
+	}
+	ost << "Books with token \"" << token << "\":\n" << endl;
+	item* current = list.head;
+	volume* book = booklist.head;
+	while(current && book) {
+		book = booklist.find(book, current->index_number).rtn;
+		if(!book) {
+			break;
+		}
+		booklist.print_book(book, ost);
+		current = current->next_item;
+		book = book->volume_next;
+	}
+}
+
+void Book::print_book(std::string name, std::ostream& ost) {
+	booklist.print_book(name, ost);
+}
+
+void Book::print_book(int index, std::ostream& ost) {
+	booklist.print_book(index, ost);
+}
+

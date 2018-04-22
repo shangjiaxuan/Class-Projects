@@ -40,6 +40,7 @@ public:
 
 	void save();
 	void load();
+
 private:
 	std::ifstream index_input;
 	std::ofstream index_output;
@@ -66,4 +67,8 @@ protected:
 
 	void print_booklist(std::ostream& ost);
 	void print_index(std::ostream& ost);
+
+	void print_book(int index, std::ostream& ost);
+	void print_book(std::string name, std::ostream& ost);
+	void print_token(std::string token, std::ostream& ost);
 };

@@ -32,6 +32,10 @@ private:
 	void list_index();
 	void list_index_stream(std::ostream& ost);
 
+	void find();
+	void find_book();
+	void find_token();
+
 	//adds a string that is not considered to be a token
 	std::string parse_bookname(std::string line);
 	std::string parse_path(std::string line);

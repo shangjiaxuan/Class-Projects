@@ -4,6 +4,11 @@
 
 #define CharNum 256
 
+class CharTree;
+class index_list;
+struct node;
+struct item;
+
 struct item {
 	~item() {
 		if(next_item){
@@ -18,14 +23,7 @@ struct item {
 
 
 class index_list {
-	public:
-	index_list() {
-		head = nullptr;
-	}
-	~index_list() {
-		delete head;
-		head = nullptr;
-	}
+public:
 	item* head;
 	void add(int index);
 	void del(int index);
@@ -33,6 +31,15 @@ class index_list {
 	void load_index(std::ifstream& ifs);
 	operator bool(){
 		return head;
+	}
+	friend node;
+private:
+	index_list() {
+		head = nullptr;
+	}
+	~index_list() {
+		delete head;
+		head = nullptr;
 	}
 };
 
@@ -103,7 +110,7 @@ public:
 //	~CharTree();
 	const node head;
 	node* locate(std::string token);
-	index_list access(std::string token);
+	index_list& access(std::string token);
 	node* add_token(std::string token);
 	bool one_succ(node** list);
 	bool del_token(std::string token);

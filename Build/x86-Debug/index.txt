@@ -1,4 +1,0 @@
-The following are all the indexes in repository:
-
-BOOK:	0 
-TEST:	0 

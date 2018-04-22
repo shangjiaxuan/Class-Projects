@@ -3,7 +3,8 @@
 using namespace std;
 
 list::found list::find(int index) {
-	static int default_index;
+	return find(head, index);
+/*	static int default_index;
 	int cur_index{ 0 };
 	if (!head) {
 		return { 'N', nullptr , nullptr , "" , 0 };
@@ -31,6 +32,73 @@ list::found list::find(int index) {
 		if(cur_index==current->index_number) {
 			cur_index++;
 		}else {
+			default_index = cur_index;
+		}
+		if (current->volume_next == nullptr) {
+			default_index = cur_index + 1;
+			return { 'M' , current, nullptr, "", default_index };
+		}
+		traceback = current;
+		current = current->volume_next;
+	}
+	if (index == current->index_number) {
+		volume* temp = head;
+		while (temp->volume_next != nullptr) {
+			if (temp->index_number == cur_index) {
+				cur_index++;
+			}
+			else {
+				default_index = cur_index;
+			}
+			temp = temp->volume_next;
+		}
+		default_index = cur_index + 1;
+		return { 'P' , current, traceback, current->name, default_index };
+	}
+	volume* temp = head;
+	while (temp->volume_next != nullptr) {
+		if (temp->index_number == cur_index) {
+			cur_index++;
+		}
+		else {
+			default_index = cur_index;
+		}
+		temp = temp->volume_next;
+	}
+	default_index = cur_index + 1;
+	return { 'L' , nullptr, traceback->volume_next, "", default_index };*/
+}
+
+list::found list::find(volume* start, int index) {
+	static int default_index;
+	int cur_index{ 0 };
+	if (!start) {
+		return { 'N', nullptr , nullptr , "" , 0 };
+	}
+	if (index < start->index_number) {
+		return { 'S' , nullptr, start->volume_next, "", 0 };
+	}
+	if (start==head&&index == head->index_number) {
+		volume* temp = head;
+		while (temp->volume_next != nullptr) {
+			if (temp->index_number == cur_index) {
+				cur_index++;
+			}
+			else {
+				default_index = cur_index;
+			}
+			temp = temp->volume_next;
+		}
+
+		return { 'P' , head, nullptr, head->name, index };
+	}
+	volume* current = start;
+	volume* traceback = nullptr;
+	while (index > current->index_number) {
+		if (cur_index == current->index_number) {
+			cur_index++;
+		}
+		else {
 			default_index = cur_index;
 		}
 		if (current->volume_next == nullptr) {

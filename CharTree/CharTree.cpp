@@ -27,7 +27,7 @@ node::~node() {
 }
 
 node* CharTree::locate(std::string token) {
-	const int size = token.size();
+	const size_t size = token.size();
 	node* current = const_cast<node*>(&head);
 	unsigned char loc;
 	if(size==0) {
@@ -44,13 +44,18 @@ node* CharTree::locate(std::string token) {
 	return current;
 }
 
-index_list CharTree::access(std::string token) {
-	return locate(token)->list;
+//按引用传递，不然链表会被析构函数消除
+index_list& CharTree::access(std::string token) {
+	node* node = locate(token);
+	if(!node) {
+		throw runtime_error("CharTree::access: no such token exists!");
+	}
+	return node->list;
 //	return locate(token)->head;
 }
 
 node* CharTree::add_token(std::string token) {
-	const int size = token.size();
+	const size_t size = token.size();
 	node* current = const_cast<node*>(&head);
 	unsigned char loc;
 	for (int i = 0; i < size; i++) {
@@ -77,7 +82,7 @@ node* CharTree::add_token(std::string token) {
 }
 
 bool CharTree::del_token(std::string token) {
-	int size = token.size();
+	size_t size = token.size();
 	node* current = const_cast<node*>(&head);
 	//see if the character is the only one and the branch can be removed
 	bool* remove = new bool[size]();

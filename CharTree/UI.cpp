@@ -60,6 +60,9 @@ void UI::parser() {
 	else if(cmd=="save") {
 		base.save();
 	}
+	else if(cmd=="find") {
+		find();
+	}
 	else {
 		throw runtime_error("UI::UI_main: unknown command!");
 	}
@@ -195,6 +198,7 @@ void UI::list_book() {
 		ofs.close();
 	}
 	else {
+		cout << '\n';
 		list_book_stream(cout);
 		cout << endl;
 	}
@@ -217,6 +221,7 @@ void UI::list_index() {
 		ofs.close();
 	}
 	else {
+		cout << '\n';
 		list_index_stream(cout);
 	}
 }
@@ -230,6 +235,63 @@ void UI::list_index_stream(std::ostream& ost) {
 	ost << "The following are all the indexes in repository:\n" << endl;
 	base.print_index(ost);
 }
+
+void UI::find() {
+	string cmd;
+	cin >> cmd;
+	ignore_space(cin);
+	if (cmd == "book") {
+		find_book();
+	}
+	else if (cmd == "token") {
+		find_token();
+	}
+	else {
+		throw runtime_error("UI::list: unknown command!");
+	}
+}
+
+void UI::find_book() {
+	string cmd;
+	string name;
+	int index;
+	ignore_space(cin);
+	getline(cin, cmd);
+	istringstream iss;
+	if(iss >> index) {
+		cout << '\n';
+		base.print_book(index, cout);
+	}
+	else {
+		name = parse_bookname(cmd);
+		base.To_standard(name);
+		cout << '\n';
+		base.print_book(name, cout);
+	}
+}
+
+void UI::find_token() {
+	string token;
+	cin >> token;
+	base.To_standard(token);
+	char c;
+	ignore_space(cin);
+	cin.get(c);
+	if(c=='>') {
+		ignore_space(cin);
+		string path;
+		getline(cin, path);
+		path = parse_path(path);
+		ofstream ofs;
+		ofs.open(path);
+		base.print_token(token, ofs);
+		ofs.close();
+		return;
+	}
+	cout << '\n';
+	base.print_token(token,cout);
+}
+
 
 string UI::parse_bookname(string line) {
 	istringstream iss(line);

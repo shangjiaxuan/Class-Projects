@@ -57,6 +57,10 @@ class list {
 	void save(std::ofstream& ofs);
 	void load(std::ifstream& ifs);
 
+	void print_book(int index, std::ostream& ost);
+	void print_book(std::string name, std::ostream& ost);
+	void print_book(volume* book, std::ostream& ost);
+
 	struct found {
 		//the status of the found item
 		//legend:
@@ -75,6 +79,7 @@ class list {
 	};
 	found find(int index);
 	found find(std::string name);
+	found find(volume* start, int index);
 	volume* find_default();
 };
 
