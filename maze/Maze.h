@@ -2,39 +2,19 @@
 
 #include "Cyclic_Queue.h"
 #include "Array_2D.h"
-
-constexpr char left{ 'L' };
-constexpr char right{ 'R' };
-constexpr char up{ 'U' };
-constexpr char down{ 'D' };
-
-struct step {
-	size_t row;
-	size_t col;
-	char direction;
-	void next_direction();
-	void walk();
-	step peek();
-	bool operator==(step& st) {
-		if(this->row==st.row&&this->col==st.col&&this->direction==st.direction) {
-			return true;
-		}
-		return false;
-	}
-	void print(std::ostream& ost);
-};
+#include "Stack.h"
 
 class Maze {
 public:
 	Maze();
-	Cyclic_Queue<step>* Queue;
-	Cyclic_Queue<step>* Route;
+	Cyclic_Queue* Queue;
+	Stack* Route;
 	Array_2D<char>* maze;
 	step current;
-	static size_t end_row;
-	static size_t end_col;
-	static size_t start_row;
-	static size_t start_col;
+	size_t end_row;
+	size_t end_col;
+	size_t start_row;
+	size_t start_col;
 	void look_around();
 	bool direction_okay();
 	void walk();

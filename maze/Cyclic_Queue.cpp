@@ -2,13 +2,13 @@
 
 using namespace std;
 
-template<typename type>
-type Cyclic_Queue<type>::pop_front() {
+//template<typename type>
+step Cyclic_Queue::pop_front() {
 	if(empty) {
 		throw std::runtime_error("Cyclic_Queue::pop_front: Cyclic_Queue is empty!");
 	}
-	type rtn = data[start];
-	data[start] = type();
+	step rtn = data[start];
+	data[start] = step();
 	if (start == end) {
 		empty = true;
 		start = 0;
@@ -22,12 +22,13 @@ type Cyclic_Queue<type>::pop_front() {
 	return rtn;
 }
 
-template<typename type>
-void Cyclic_Queue<type>::push_back(type item) {
+//template<typename type>
+void Cyclic_Queue::push_back(step item) {
 	if(empty) {
 		start = 0;
 		end = 0;
 		data[0] = item;
+		empty = false;
 		return;
 	}
 	end++;
@@ -40,8 +41,8 @@ void Cyclic_Queue<type>::push_back(type item) {
 	data[end] = item;
 }
 
-template<typename type> 
-bool Cyclic_Queue<type>::exist(const type& compared) {
+//template<typename type> 
+bool Cyclic_Queue::exist(step& compared) {
 	size_t i = start;
 	do {
 		if(data[i]==compared) {
@@ -55,10 +56,10 @@ bool Cyclic_Queue<type>::exist(const type& compared) {
 	return false;
 }
 
-template<typename type>
-void Cyclic_Queue<type>::print(std::ostream& ost) {
-	size_t size = size();
-	for(size_t i=0; i<size; i++) {
+//template<typename type>
+void Cyclic_Queue::print(std::ostream& ost) {
+	size_t queue_size = size();
+	for(size_t i=0; i<queue_size; i++) {
 		data[i].print(ost);
 	}
 	ost << endl;
@@ -66,5 +67,5 @@ void Cyclic_Queue<type>::print(std::ostream& ost) {
 
 
 
-template<typename type>
-size_t Cyclic_Queue<type>::total_size;
+//template<typename type>
+//size_t Cyclic_Queue<type>::total_size;

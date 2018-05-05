@@ -155,14 +155,18 @@
   <ItemGroup>
     <ClCompile Include="Array_2D.cpp" />
     <ClCompile Include="Array_2D.h" />
+    <ClCompile Include="Stack.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Maze.cpp" />
     <ClCompile Include="Cyclic_Queue.cpp" />
+    <ClCompile Include="step.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Stack.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="Maze.h" />
     <ClInclude Include="Cyclic_Queue.h" />
+    <ClInclude Include="step.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

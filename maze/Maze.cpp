@@ -2,7 +2,7 @@
 
 using namespace std;
 
-template class Cyclic_Queue<step>;
+//template class Cyclic_Queue<step>;
 
 void Maze::look_around() {
 	current.direction = up;
@@ -11,63 +11,8 @@ void Maze::look_around() {
 			Queue->push_back(current);
 		}
 		current.next_direction();
-	} while (current.direction!=::left);
+	} while (current.direction!=up);
 }
-
-void step::next_direction() {
-	if(direction==up) {
-		direction = ::right;
-		return;
-	}
-	if(direction==::right) {
-		direction = down;
-		return;
-	}
-	if(direction==down) {
-		direction = ::left;
-		return;
-	}
-	if(direction==::left) {
-		direction = up;
-		return;
-	}
-	throw runtime_error("step::next_direction(): Unknown direction!");
-}
-
-void step::walk() {
-	if (direction == up) {
-		row--;
-	}
-	if (direction == ::right) {
-		col++;
-	}
-	if (direction == down) {
-		row++;
-	}
-	if (direction == ::left) {
-		col--;
-	}
-	direction = up;
-}
-
-step step::peek() {
-	step rtn = *this;
-	if (direction == up) {
-		rtn.row--;
-	}
-	if (direction == ::right) {
-		rtn.col++;
-	}
-	if (direction == down) {
-		rtn.row++;
-	}
-	if (direction == ::left) {
-		rtn.col--;
-	}
-	rtn.direction = up;
-	return rtn;
-}
-
 
 //true only if the location headed is a okay path and not covered before
 bool Maze::direction_okay() {
@@ -107,15 +52,18 @@ void Maze::walk() {
 bool Maze::Queue_okay() {
 	size_t i = Queue->start;
 	step next = current.peek();
-	do {
+	while(true) {
 		if (Queue->data[i].peek()==next) {
 			return false;
+		}
+		if(i==Queue->end) {
+			break;
 		}
 		i++;
 		if (i >= Queue->total_size) {
 			i -= Queue->total_size;
 		}
-	} while (i != Queue->end);
+	}
 	return true;
 }
 
@@ -172,15 +120,24 @@ void Maze::find_route_verbose(std::ostream& ost) {
 
 void Maze::parse_route(step added) {
 	size_t size = Route->size();
-	size_t end{ 0 };
-	for(size_t i=size-1; i>=0; i--) {
-		if ((*Route)[i].row == added.row && (*Route)[i].col == added.col) {
-			end = i + 1;
-			break;
+	size_t end{0};
+	if(size!=0) {
+		bool go_back{false};
+		for (size_t i=size - 1; i >= 0; i--) {
+			if ((*Route)[i].row == added.row && (*Route)[i].col == added.col) {
+				go_back = true;
+				break;
+			}
+			if (i == 0) {
+				break;
+			}
 		}
-	}
-	for(size_t i=0; i<end; i++) {
-		Route->pop_front();
+		if(go_back) {
+			step temp=Route->pop_back();
+			while(temp.row!=added.row||temp.col!=added.col) {
+				temp = Route->pop_back();
+			}
+		}
 	}
 	Route->push_back(added);
 }
@@ -205,6 +162,7 @@ void step::print(std::ostream& ost) {
 }
 
 void Maze::print_result() {
+	cout << "The result is:\n";
 	Route->print(cout);
 }
 
@@ -214,21 +172,21 @@ void Maze::solve_maze() {
 }
 
 void Maze::load_maze(std::istream& ist) {
-	size_t row{ 0 };
-	size_t col{ 0 };
+//	size_t row{ 0 };
+//	size_t col{ 0 };
 	string line;
 	char value;
 	bool ended{false};
 	bool started{false};
-	do{
-		if (row >= maze->length) {
-			throw range_error("Maze::load_maze(std::ifstream&): too many lines for given length!");
-		}
+	for (size_t row = 0; row < maze->length; row++) {
+//		if (row >= maze->length) {
+//			throw range_error("Maze::load_maze(std::ifstream&): too many lines for given length!");
+//		}
 		getline(ist, line);
 		istringstream iss{ line };
-		col = 0;
-		while (iss && maze->length>row) {
-			if(col>=maze->width) {
+//		col = 0;
+		for (size_t col = 0; col < maze->width; col++) {
+			if(line.size()!=maze->width) {
 				throw range_error("Maze::load_maze(std::ifstream&): input on certain line too long for given width!");
 			}
 			iss.get(value);
@@ -251,16 +209,15 @@ void Maze::load_maze(std::istream& ist) {
 			else {
 				throw range_error("Maze::load_maze(std::ifstream&): maze can only be consisted of '0's, '1's, '2's, or '3's!");
 			}
-			col++;
 		}
-		if(col!=maze->width-1) {
-			throw range_error("Maze::load_maze(std::istream&): wrong length of line!");
-		}
-		row++;
-	}while (line != "");
-	if(row!=maze->length-1) {
-		throw range_error("Maze::load_maze(std::istream&): wrong number of lines!");
-	}
+//		if(col!=maze->width-1) {
+//			throw range_error("Maze::load_maze(std::istream&): wrong length of line!");
+//		}
+//		row++;
+	}//while (line != "");
+//	if(row!=maze->length-1) {
+//		throw range_error("Maze::load_maze(std::istream&): wrong number of lines!");
+//	}
 	if(!started||!ended) {
 		throw runtime_error("Maze::load_maze(std::ifstream&): no start or end point specified!");
 	}
@@ -280,8 +237,8 @@ void Maze::scan_maze_input(std::ifstream& ifs) {
 		getline(ifs, line);
 	}
 	maze = new Array_2D<char>{ length,width };
-	Queue = new Cyclic_Queue<step>{ 4*length*width };
-	Route = new Cyclic_Queue<step>{ length*width };
+	Queue = new Cyclic_Queue{ 4*length*width };
+	Route = new Stack{ length*width };
 }
 
 Maze::Maze() {
@@ -293,8 +250,8 @@ Maze::Maze() {
 	size_t length;
 	if(iss>>length>>width) {
 		maze = new Array_2D<char>{ length,width };
-		Queue = new Cyclic_Queue<step>{ 4 * length*width };
-		Route = new Cyclic_Queue<step>{ length*width };
+		Queue = new Cyclic_Queue{ 4 * length*width };
+		Route = new Stack{ length*width };
 		load_maze(cin);
 	}
 	else {
@@ -305,6 +262,11 @@ Maze::Maze() {
 			throw runtime_error("Maze::Maze(): cannot open specified file!");
 		}
 		scan_maze_input(ifs);
+		ifs.close();
+		ifs.open(line);
+		if (!ifs) {
+			throw runtime_error("Maze::Maze(): cannot open specified file!");
+		}
 		load_maze(ifs);
 		return;
 	}
