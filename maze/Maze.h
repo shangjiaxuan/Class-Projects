@@ -26,6 +26,7 @@ struct step {
 
 class Maze {
 public:
+	Maze();
 	Cyclic_Queue<step>* Queue;
 	Cyclic_Queue<step>* Route;
 	Array_2D<char>* maze;
@@ -70,6 +71,8 @@ public:
 	void print_result();
 	void solve_maze();
 	void load_maze(std::istream& ist);
+	void scan_maze_input(std::ifstream& ifs);
+	std::string parse_path(std::string line);
 };
 
 

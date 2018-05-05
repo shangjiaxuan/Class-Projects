@@ -1,7 +1,7 @@
 ﻿#include "Maze.h"
 
 int main() {
-	Maze This( 10 ,10 );
+	Maze This;
 	system("pause");
 	return 0;
 }

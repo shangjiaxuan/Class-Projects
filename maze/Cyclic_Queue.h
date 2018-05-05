@@ -6,7 +6,7 @@ template<typename type>
 class Cyclic_Queue {
 //#define MAX_LENGTH 10000
 public:
-	Cyclic_Queue(int queue_size) {
+	Cyclic_Queue(size_t queue_size) {
 		data = new type[queue_size];
 		total_size = queue_size;
 	}
