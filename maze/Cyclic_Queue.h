@@ -10,6 +10,10 @@ public:
 		data = new type[queue_size];
 		total_size = queue_size;
 	}
+	~Cyclic_Queue() {
+		delete[] data;
+		data = nullptr;
+	}
 	type* data;// [MAX_LENGTH];
 	static size_t total_size;
 	size_t start{ 0 };
@@ -27,7 +31,7 @@ public:
 		if(empty) {
 			return 0;
 		}
-		int temp = end - start + 1;
+		size_t temp = end - start + 1;
 		if (temp >= 0) {
 			return temp;
 		} else {
@@ -42,7 +46,7 @@ public:
 		if(i>=size()) {
 			throw std::out_of_range("Cyclic_Queue::operator[]: index too large!");
 		}
-		int temp = start + i;
+		size_t temp = start + i;
 		if(temp<total_size) {
 			return data[temp];
 		}
@@ -50,11 +54,8 @@ public:
 			return data[temp - total_size];
 		}
 	}
+	bool exist(const type& compared);
+	void print(std::ostream& ost);
 };
 
-struct step {
-	size_t row;
-	size_t col;
-	char direction;
-};
 

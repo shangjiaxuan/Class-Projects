@@ -40,8 +40,31 @@ void Cyclic_Queue<type>::push_back(type item) {
 	data[end] = item;
 }
 
+template<typename type> 
+bool Cyclic_Queue<type>::exist(const type& compared) {
+	size_t i = start;
+	do {
+		if(data[i]==compared) {
+			return true;
+		}
+		i++;
+		if(i>=total_size) {
+			i -= total_size;
+		}
+	} while (i != end);
+	return false;
+}
+
+template<typename type>
+void Cyclic_Queue<type>::print(std::ostream& ost) {
+	size_t size = size();
+	for(size_t i=0; i<size; i++) {
+		data[i].print(ost);
+	}
+	ost << endl;
+}
+
+
+
 template<typename type>
 size_t Cyclic_Queue<type>::total_size;
-
-template class Cyclic_Queue<step>;
-
