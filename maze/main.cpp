@@ -1,16 +1,15 @@
 ﻿#include "Maze.h"
 
 int main() {
-	try {
-		Maze This;
-		std::cout << "The specified maze is:\n";
-		This.maze->print_map_value(std::cout);
-		This.solve_maze();
-		This.print_result();
-	}catch(std::exception& e) {
-		std::cerr << e.what();
+	Maze::name_ver();
+	while(Maze::on) {
+		try {
+			Maze This;
+			This.Interaction();
+		}
+		catch (std::exception& e) {
+			std::cerr << e.what() << '\n' << std::endl;
+		}
 	}
-
-	system("pause");
 	return 0;
 }

@@ -55,3 +55,23 @@ step step::peek() {
 	rtn.direction = up;
 	return rtn;
 }
+
+
+void step::print(std::ostream& ost) {
+	ost << "Row:\t" << row << '\n';
+	ost << "Column:\t" << col << '\n';
+	ost << "Direction:\t";
+	if (direction == up) {
+		ost << "up\n";
+	}
+	else if (direction == ::right) {
+		ost << "right\n";
+	}
+	else if (direction == down) {
+		ost << "down\n";
+	}
+	else if (direction == ::left) {
+		ost << "left\n";
+	}
+	ost << endl;
+}

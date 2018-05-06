@@ -32,11 +32,10 @@ public:
 		if(empty) {
 			return 0;
 		}
-		long long temp = end - start + 1;
-		if (temp >= 0) {
-			return temp;
+		if (end+1 >= start) {
+			return end - start + 1;
 		} else {
-			return total_size + temp;
+			return total_size + end - start + 1;
 		}
 	};
 	operator bool(){

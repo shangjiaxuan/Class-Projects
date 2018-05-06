@@ -2,7 +2,67 @@
 
 using namespace std;
 
-//template class Cyclic_Queue<step>;
+bool Maze::on{ true };
+
+Maze::Maze() {
+	string line;
+	prompt();
+	getline(cin, line);
+	istringstream iss{ line };
+	size_t width;
+	size_t length;
+	if (iss >> length >> width) {
+		maze = new Array_2D<char>{ length,width };
+		Queue = new Cyclic_Queue{ 4 * length*width };
+		Route = new Stack{ length*width };
+		load_maze(cin);
+	}
+	else {
+		line = parse_path(line);
+		ifstream ifs;
+		ifs.open(line);
+		if (!ifs) {
+			throw runtime_error("Maze::Maze(): cannot open specified file!");
+		}
+		scan_maze_input(ifs);
+		ifs.close();
+		ifs.open(line);
+		if (!ifs) {
+			throw runtime_error("Maze::Maze(): cannot open specified file!");
+		}
+		load_maze(ifs);
+		return;
+	}
+}
+
+void Maze::Interaction() {
+	std::cout << "The specified maze is:\n";
+	maze->print_map_value(std::cout);
+	solve_maze();
+	print_result();
+	conti();
+}
+
+void Maze::name_ver() {
+	cout << "Maze\n";
+	cout << "v0.0.0.0\n";
+	cout << "Simple breadth-first maze solver.\n" << endl;
+}
+
+void Maze::solve_maze() {
+	find_route_verbose(cout);
+}
+
+void Maze::print_result() {
+	cout << "The result is:\n";
+	Route->print(cout);
+}
+
+void Maze::start() {
+	current.row = start_row;
+	current.col = start_col;
+	current.direction = up;
+}
 
 void Maze::look_around() {
 	current.direction = up;
@@ -12,6 +72,48 @@ void Maze::look_around() {
 		}
 		current.next_direction();
 	} while (current.direction!=up);
+}
+
+void Maze::pop_front() {
+	current = Queue->pop_front();
+}
+
+void Maze::walk() {
+	parse_route(current);
+	current.walk();
+	set_passed();
+}
+
+void Maze::parse_route(step added) {
+	size_t size = Route->size();
+	size_t end{ 0 };
+	if (size != 0) {
+		bool go_back{ false };
+		for (size_t i = size - 1; i >= 0; i--) {
+			if ((*Route)[i].row == added.row && (*Route)[i].col == added.col) {
+				go_back = true;
+				break;
+			}
+			if (i == 0) {
+				break;
+			}
+		}
+		if (go_back) {
+			step temp = Route->pop_back();
+			while (temp.row != added.row || temp.col != added.col) {
+				temp = Route->pop_back();
+			}
+		}
+	}
+	Route->push_back(added);
+}
+
+void Maze::set_passed() {
+	maze->map[current.row][current.col] = 2;
+}
+
+void Maze::reset_passed() {
+	maze->map[current.row][current.col] = 0;
 }
 
 //true only if the location headed is a okay path and not covered before
@@ -43,12 +145,6 @@ bool Maze::direction_okay() {
 	throw runtime_error("Maze::direction_okay(): Unknown direction!");
 }
 
-void Maze::walk() {
-	parse_route(current);
-	current.walk();
-	set_passed();
-}
-
 bool Maze::Queue_okay() {
 	size_t i = Queue->start;
 	step next = current.peek();
@@ -67,8 +163,11 @@ bool Maze::Queue_okay() {
 	return true;
 }
 
-void Maze::pop_front() {
-	current = Queue->pop_front();
+bool Maze::finished() {
+	if (current.row == end_row && current.col == end_col) {
+		return true;
+	}
+	return false;
 }
 
 void Maze::find_route() {
@@ -116,59 +215,17 @@ void Maze::find_route_verbose(std::ostream& ost) {
 	}
 }
 
-
-
-void Maze::parse_route(step added) {
-	size_t size = Route->size();
-	size_t end{0};
-	if(size!=0) {
-		bool go_back{false};
-		for (size_t i=size - 1; i >= 0; i--) {
-			if ((*Route)[i].row == added.row && (*Route)[i].col == added.col) {
-				go_back = true;
-				break;
-			}
-			if (i == 0) {
-				break;
-			}
-		}
-		if(go_back) {
-			step temp=Route->pop_back();
-			while(temp.row!=added.row||temp.col!=added.col) {
-				temp = Route->pop_back();
-			}
-		}
-	}
-	Route->push_back(added);
+void Maze::set_end(size_t row, size_t col) {
+	end_row = row;
+	end_col = col;
+}
+void Maze::set_start(size_t row, size_t col) {
+	start_row = row;
+	start_col = col;
 }
 
-void step::print(std::ostream& ost) {
-	ost << "Row:\t" << row << '\n';
-	ost << "Column:\t" << col << '\n';
-	ost << "Direction:\t";
-	if (direction == up) {
-		ost << "up\n";
-	}
-	else if (direction == ::right) {
-		ost << "right\n";
-	}
-	else if (direction == down) {
-		ost << "down\n";
-	}
-	else if (direction == ::left) {
-		ost << "left\n";
-	}
-	ost << endl;
-}
-
-void Maze::print_result() {
-	cout << "The result is:\n";
-	Route->print(cout);
-}
-
-void Maze::solve_maze() {
-	find_route_verbose(cout);
-	print_result();
+void Maze::prompt() {
+	cout << "Please specify the maze you wish to solve:\n" << endl;
 }
 
 void Maze::load_maze(std::istream& ist) {
@@ -241,34 +298,19 @@ void Maze::scan_maze_input(std::ifstream& ifs) {
 	Route = new Stack{ length*width };
 }
 
-Maze::Maze() {
-	string line;
-	cout << "Please specify the maze you wish to solve:\n";
-	getline(cin, line);
-	istringstream iss{ line };
-	size_t width;
-	size_t length;
-	if(iss>>length>>width) {
-		maze = new Array_2D<char>{ length,width };
-		Queue = new Cyclic_Queue{ 4 * length*width };
-		Route = new Stack{ length*width };
-		load_maze(cin);
-	}
-	else {
-		line = parse_path(line);
-		ifstream ifs;
-		ifs.open(line);
-		if(!ifs) {
-			throw runtime_error("Maze::Maze(): cannot open specified file!");
-		}
-		scan_maze_input(ifs);
-		ifs.close();
-		ifs.open(line);
-		if (!ifs) {
-			throw runtime_error("Maze::Maze(): cannot open specified file!");
-		}
-		load_maze(ifs);
+void Maze::conti() {
+	char c;
+	cout << "Continue? [Y/n]\t";
+	cin.get(c);
+	switch(c) {
+	case 'Y': case 'y': case '\n':
+		cout << endl;
 		return;
+	case 'N': case 'n':
+		on = false;
+		return;
+	default:
+		throw runtime_error("Maze::conti(): unknown choice!");
 	}
 }
 
