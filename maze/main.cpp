@@ -1,10 +1,10 @@
 ﻿#include "Maze.h"
 
 int main() {
-	Maze::name_ver();
-	while(Maze::on) {
+	Maze::Maze::name_ver();
+	while(Maze::Maze::on) {
 		try {
-			Maze This;
+			Maze::Maze This;
 			This.Interaction();
 		}
 		catch (std::exception& e) {

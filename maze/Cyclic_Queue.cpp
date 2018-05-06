@@ -2,13 +2,13 @@
 
 using namespace std;
 
-//template<typename type>
-step Cyclic_Queue::pop_front() {
+template<typename type>
+type Cyclic_Queue<type>::pop_front() {
 	if(empty) {
 		throw std::runtime_error("Cyclic_Queue::pop_front: Cyclic_Queue is empty!");
 	}
-	step rtn = data[start];
-	data[start] = step();
+	type rtn = data[start];
+	data[start] = type();
 	if (start == end) {
 		empty = true;
 		start = 0;
@@ -22,8 +22,8 @@ step Cyclic_Queue::pop_front() {
 	return rtn;
 }
 
-//template<typename type>
-void Cyclic_Queue::push_back(step item) {
+template<typename type>
+void Cyclic_Queue<type>::push_back(type item) {
 	if(empty) {
 		start = 0;
 		end = 0;
@@ -41,8 +41,8 @@ void Cyclic_Queue::push_back(step item) {
 	data[end] = item;
 }
 
-//template<typename type> 
-bool Cyclic_Queue::exist(step& compared) {
+template<typename type> 
+bool Cyclic_Queue<type>::exist(type& compared) {
 	size_t i = start;
 	do {
 		if(data[i]==compared) {
@@ -56,8 +56,8 @@ bool Cyclic_Queue::exist(step& compared) {
 	return false;
 }
 
-//template<typename type>
-void Cyclic_Queue::print(std::ostream& ost) {
+template<typename type>
+void Cyclic_Queue<type>::print(std::ostream& ost) {
 	size_t queue_size = size();
 	for(size_t i=0; i<queue_size; i++) {
 		data[i].print(ost);
@@ -65,6 +65,8 @@ void Cyclic_Queue::print(std::ostream& ost) {
 	ost << endl;
 }
 
+
+template class Cyclic_Queue<Maze::step>;
 
 
 //template<typename type>
