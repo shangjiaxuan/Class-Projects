@@ -20,5 +20,4 @@ public:
 	type** map;
 //protected:
 	type* data;
-	void print_map_value(std::ostream& ost);
 };

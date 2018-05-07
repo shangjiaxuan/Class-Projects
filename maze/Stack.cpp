@@ -53,6 +53,22 @@ void Stack<type>::print(std::ostream& ost) {
 	ost << endl;
 }
 
+template<typename type> 
+void Stack<type>::copy_to(Stack& target) {
+	if(target.total_size!=total_size) {
+		throw range_error("void Stack<type>::copy_to(Stack& target): stacks have different size!");
+	}
+	target.empty = empty;
+	target.end = end;
+	for(size_t i=0; i<total_size; i++) {
+		target.data[i] = data[i];
+	}
+}
+
+
+
+
+
 template class Stack<Maze::step>;
 
 //template<typename type>

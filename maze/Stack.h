@@ -15,7 +15,7 @@ public:
 		delete[] data;
 		data = nullptr;
 	}
-	type* data;// [MAX_LENGTH];
+	type* data{ nullptr };// [MAX_LENGTH];
 	size_t total_size;
 	size_t end{ 0 };
 	bool empty{ true };
@@ -45,5 +45,7 @@ public:
 	}
 	bool exist(type& compared);
 	void print(std::ostream& ost);
+
+	void copy_to(Stack& target);
 };
 

@@ -2,6 +2,18 @@
 
 using namespace std;
 
+void Maze_map::print_map_value(std::ostream & ost) {
+	unsigned a;
+	for (size_t i = 0; i<length; i++) {
+		for (size_t j = 0; j<width; j++) {
+			a = map[i][j];
+			ost << a << '\t';
+		}
+		ost << '\n';
+	}
+	ost << endl;
+}
+
 namespace Maze {
 
 	bool Maze::on{ true };
@@ -14,7 +26,9 @@ namespace Maze {
 		size_t width;
 		size_t length;
 		if (iss >> length >> width) {
-			maze = new Array_2D<char>{ length,width };
+			maze = new Maze_map{ length,width };
+			maze->init();
+			route_map = new Route_map{ length,width };
 			Queue = new Cyclic_Queue<step>{ 4 * length*width };
 			Route = new Stack<step>{ length*width };
 			load_maze(cin);
@@ -295,8 +309,10 @@ namespace Maze {
 			}
 			getline(ifs, line);
 		}
-		maze = new Array_2D<char>{ length,width };
-		Queue = new Cyclic_Queue<step>{ 4 * length*width };
+		maze = new Maze_map{ length,width };
+		maze->init();
+		route_map = new Route_map{ length,width };
+		Queue = new Cyclic_Queue<step>{ 4*length*width };
 		Route = new Stack<step>{ length*width };
 	}
 
