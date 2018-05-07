@@ -84,15 +84,15 @@ namespace Maze {
 		size_t start_col;
 
 		void solve_maze();
-		void print_result();
+		void print_result(std::ostream& ost);
 
 		void start();
 		void look_around();
 		void pop_front();
 		void walk();
 		void parse_route(step added);
-		void set_passed();
-		void reset_passed();
+		void set_passed(const step& added);
+		void reset_passed(const step& deleted);
 
 		bool direction_okay();
 		bool Queue_okay();

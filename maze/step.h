@@ -7,6 +7,7 @@ namespace Maze {
 	constexpr char right{ 'R' };
 	constexpr char up{ 'U' };
 	constexpr char down{ 'D' };
+	constexpr char null{ 'N' };
 
 	struct step {
 		size_t row;

@@ -55,7 +55,7 @@ namespace Maze {
 		std::cout << "The specified maze is:\n";
 		maze->print_map_value(std::cout);
 		solve_maze();
-		print_result();
+		print_result(cout);
 		conti();
 	}
 
@@ -69,22 +69,34 @@ namespace Maze {
 		find_route_verbose(cout);
 	}
 
-	void Maze::print_result() {
-		cout << "The result is:\n";
-		Route->print(cout);
+	void Maze::print_result(ostream& ost) {
+		ost << "The result is:\n";
+		Route->print(ost);
+		ost << "Row:\t" << end_row << '\n';
+		ost << "Column:\t" << end_col << '\n';
+		ost << "Done!\n";
+		ost << endl;
 	}
 
 	void Maze::start() {
 		current.row = start_row;
 		current.col = start_col;
-		current.direction = up;
+		current.direction = null;
+		set_passed(current);
+//		Route->push_back(current);
 	}
 
 	void Maze::look_around() {
 		current.direction = up;
 		do {
 			if (direction_okay() && Queue_okay()) {
-				Queue->push_back(current);
+				step temp = current;
+				temp.walk();
+				set_passed(temp);
+				Route->copy_to(*(route_map->map[temp.row][temp.col]));
+				route_map->map[temp.row][temp.col]->push_back(current);
+//				route_map->map[temp.row][temp.col]->push_back(temp);
+				Queue->push_back(temp);
 			}
 			current.next_direction();
 		} while (current.direction != up);
@@ -92,12 +104,13 @@ namespace Maze {
 
 	void Maze::pop_front() {
 		current = Queue->pop_front();
+		route_map->map[current.row][current.col]->copy_to(*Route);
 	}
 
 	void Maze::walk() {
-		parse_route(current);
+//		parse_route(current);
 		current.walk();
-		set_passed();
+//		set_passed();
 	}
 
 	void Maze::parse_route(step added) {
@@ -124,12 +137,12 @@ namespace Maze {
 		Route->push_back(added);
 	}
 
-	void Maze::set_passed() {
-		maze->map[current.row][current.col] = 2;
+	void Maze::set_passed(const step& added) {
+		maze->map[added.row][added.col] = 2;
 	}
 
-	void Maze::reset_passed() {
-		maze->map[current.row][current.col] = 0;
+	void Maze::reset_passed(const step& deleted) {
+		maze->map[deleted.row][deleted.col] = 0;
 	}
 
 	//true only if the location headed is a okay path and not covered before
@@ -188,7 +201,6 @@ namespace Maze {
 
 	void Maze::find_route() {
 		start();
-		set_passed();
 		size_t steps{ 0 };
 		while (!finished() && steps < (maze->length*maze->width)) {
 			look_around();
@@ -203,11 +215,12 @@ namespace Maze {
 
 	void Maze::find_route_verbose(std::ostream& ost) {
 		start();
-		set_passed();
 		size_t steps{ 0 };
 		ost << "Current maze is:\n";
 		maze->print_map_value(ost);
 		while (!finished() && steps < (maze->length*maze->width)) {
+			ost << "Current path is:\n";
+			Route->print(ost);
 			ost << "Finding directions that are okay...\n";
 			look_around();
 			ost << "Queue is now:\n";
@@ -216,15 +229,13 @@ namespace Maze {
 			pop_front();
 			ost << "Current state is now:\n";
 			current.print(ost);
-			ost << "Walking according to direction...\n";
-			walk();
+//			ost << "Walking according to direction...\n";
+//			walk();
 			steps++;
 			ost << "Current state is now:\n";
 			current.print(ost);
 			ost << "Current maze is:\n";
 			maze->print_map_value(ost);
-			ost << "Current path is:\n";
-			Route->print(ost);
 		}
 		if (steps >= (maze->length*maze->width)) {
 			throw runtime_error("Maze::find_route_verbose(): cannot find route to solve maze!");

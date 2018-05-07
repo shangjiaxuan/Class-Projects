@@ -36,7 +36,7 @@ namespace Maze {
 		if (direction == left) {
 			col--;
 		}
-		direction = up;
+		direction = null;
 	}
 
 	step step::peek() {
@@ -53,7 +53,7 @@ namespace Maze {
 		if (direction == left) {
 			rtn.col--;
 		}
-		rtn.direction = up;
+		rtn.direction = null;
 		return rtn;
 	}
 
