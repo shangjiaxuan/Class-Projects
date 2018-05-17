@@ -101,6 +101,17 @@ namespace vehicle_control {
 	void controls::load() {
 		ifstream ifs;
 		ifs.open("save.dat");
+		if (!ifs) {
+			ofstream ofs;
+			ofs.open("save.dat");
+			ofs.close();
+			ifs.open("save.dat");
+			if(!ifs) {
+				throw runtime_error("controls::load(): Cannot open file for loading!");
+			}
+			ifs.close();
+			return;
+		}
 		for(int i=0; i<MAX_CAR; i++) {
 			if(ifs.eof()){break;}
 			car_num++;
