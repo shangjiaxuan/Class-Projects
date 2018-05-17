@@ -18,10 +18,11 @@ void Haffman::init() {
 	cout << "Reading file to initialize frequancy list...\n";
 	unsigned char temp;
 	char ch;
+	ifs.get(ch);
 	while(!ifs.eof()) {
-		ifs.get(ch);
 		temp = ch;
 		tree[temp].weight++;
+		ifs.get(ch);
 	}
 	cout << endl;
 	cout << "Done initializing list, initializing Haffman tree...\n";
@@ -96,18 +97,19 @@ void node::print(std::ostream& ost) {
 void Haffman::encode(std::istream& input, std::ostream& output) {
 	char c;
 	unsigned char temp;
+	input.get(c);
 	while(!input.eof()) {
-		input.get(c);
 		temp = c;
-		encode_char(temp,output);
+		encode_char(temp, output);
+		input.get(c);
 	}
 }
 
 void Haffman::decode(std::istream& input, std::ostream& output) {
 	char c;
 	short current = root;
-	while(!input.eof()) {
-		while(true) {
+	do {
+		while(!input.eof()) {
 			input.get(c);
 			if (c == '0') {
 				if (tree[current].lchild<0) {
@@ -137,7 +139,7 @@ void Haffman::decode(std::istream& input, std::ostream& output) {
 				throw runtime_error("Haffman::decode(std::istream&, std::ostream&): Unkown signal state!");
 			}
 		}
-	}
+	} while (!input.eof());
 }
 
 void Haffman::encode_char(unsigned char ch, std::ostream& output) {
