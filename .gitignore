@@ -299,4 +299,6 @@ __pycache__/
 *.xsd.cs
 
 #my Specific
-Intermediates/
+**/.[Ii]ntermediates/
+**/.[Bb]uild/
+
