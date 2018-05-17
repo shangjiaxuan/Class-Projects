@@ -1,5 +1,0 @@
-﻿  KMP.cpp
-c:\users\shangjiaxuan\documents\source code\class projects\kmp\kmp\kmp.cpp(70): warning C4244: '=': conversion from '__int64' to 'long', possible loss of data
-  main.cpp
-  Generating Code...
-  KMP.vcxproj -> C:\Users\shangjiaxuan\Documents\Source code\Class Projects\KMP\Build\x86-Debug\KMP.exe
