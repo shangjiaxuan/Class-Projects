@@ -1,13 +1,16 @@
-#pragma once
+﻿#pragma once
 
 #include "Header.h"
+
+extern bool on;
 
 struct index_block {
 	int* data;
 	size_t start;
-	size_t bock_size;
+	size_t block_size;
+	int max=std::numeric_limits<int>::lowest();
 	int& operator[](size_t i) {
-		if (!(i<bock_size)) {
+		if (!(i<block_size)) {
 			throw std::runtime_error("int& index_block::operator[](size_t): index too large!");
 		}
 		return data[start + i];
@@ -15,36 +18,25 @@ struct index_block {
 };
 
 class search {
+public:
 	search();
 	~search();
+	bool conti{ true };
+	static void name_ver();
 	size_t block_num;
 	index_block* index;
 	int* data;
+	void print(std::ostream& ost);
+	size_t search_index(int code);
+	long long search_block(size_t block, int code);
+	struct coordinate{
+		size_t block;
+		long long place;
+	};
+	coordinate search_code(int code);
+	void print_result(std::ostream& ost, const coordinate& cor);
+	void UI();
+	void search_cmd();
 };
 
-inline std::string parse_path(std::string line) {
-	std::string path;
-	std::istringstream iss(line);
-	char current;
-	iss.get(current);
-	while (current == ' ') {
-		iss.get(current);
-	}
-	iss.putback(current);
-	while (iss) {
-		iss.get(current);
-		switch (current) {
-		case '\"':
-			iss.get(current);
-			while (current != '\"') {
-				path.push_back(current);
-				iss.get(current);
-			}
-			break;
-		default:
-			path.push_back(current);
-			iss.get(current);
-		}
-	}
-	return path;
-}
+std::string parse_path(std::string line);
