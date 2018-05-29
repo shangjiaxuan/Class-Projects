@@ -4,6 +4,7 @@ using namespace std;
 
 int main() {
 	BinSort This;
+	This.search_verbose(5);
 	system("pause");
 	return 0;
 }

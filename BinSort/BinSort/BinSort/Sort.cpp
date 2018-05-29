@@ -32,6 +32,10 @@ BinSort::BinSort() {
 		sort(ifs);
 		ifs.close();
 	}
+	cout << "Done sorting the indexes.!\n" <<endl;
+	cout << "Current memory status is:\n";
+	print();
+	cout << endl;
 }
 
 void BinSort::init(istream& ist) {
@@ -53,12 +57,19 @@ void BinSort::sort(istream& ist) {
 }
 
 void BinSort::add(size_t added) {
+	cout<<"current memory is:\n";
+	print();
+	cout << "Adding node " << added << '\n';
 	long long root=find_parent_node(this->root, data[added].data);
+	cout << "parent found to be " << root << '\n';
 	if (root < 0) {
 		return;
 	}
 	if (data[added].data < data[root].data) {
+		cout << "Adding to left of parent..\n";
 		unbalance unb = add_left(root, added);
+		cout << "current memory is:\n";
+		print();
 		if (unb.subtree<0) {
 			return;
 		}
@@ -67,7 +78,10 @@ void BinSort::add(size_t added) {
 		}
 	}
 	else if (data[added].data >= data[root].data) {
+		cout << "Adding to right of parent..\n";
 		unbalance unb = add_right(root, added);
+		cout << "current memory is:\n";
+		print();
 		if (unb.subtree<0) {
 			return;
 		}
@@ -99,6 +113,8 @@ long long BinSort::find_parent_node(long long root, int index) {
 }
 
 BinSort::unbalance BinSort::add_left(size_t subtree, size_t added) {
+	cout << "current memory is:\n";
+	print();
 	data[subtree].lchild = added;
 	data[added].parent = subtree;
 	data[added].depth = 1;
@@ -106,6 +122,8 @@ BinSort::unbalance BinSort::add_left(size_t subtree, size_t added) {
 }
 
 BinSort::unbalance BinSort::add_right(size_t subtree, size_t added) {
+	cout << "current memory is:\n";
+	print();
 	data[subtree].rchild = added;
 	data[added].parent = subtree;
 	data[added].depth = 1;
@@ -113,47 +131,78 @@ BinSort::unbalance BinSort::add_right(size_t subtree, size_t added) {
 }
 
 BinSort::unbalance BinSort::find_smallest_unbalance(long long start,bool current) {
-	unbalance rtn;
-	rtn.current = current;
-	rtn.child = false;
-	while (start >= 0 && (data[data[start].lchild].depth != data[data[start].rchild].depth)){
-		if (data[data[start].lchild].depth > data[data[start].rchild].depth) {
-			data[start].depth = data[data[start].lchild].depth + 1;
-			if ((data[data[start].lchild].depth - data[data[start].rchild].depth) == 1) {
+	unbalance rtn{current,false,start};
+	while (start>=0) {
+		set_depth(start);
+		if (data[start].lchild < 0) {
+			if (data[start].rchild < 0) {
+				break;
+			}
+			else if (data[data[start].rchild].depth==1) {
 				start = data[start].parent;
 				rtn.child = rtn.current;
-				if (data[data[start].parent].rchild == start) {
-					rtn.current = true;
-				}
-				else {
-					rtn.current = false;
-				}
+				rtn.current = true;
+				continue;
 			}
 			else {
+				rtn.child = rtn.current;
+				rtn.current = true;
+				rtn.subtree = current;
 				return rtn;
 			}
+		}
+		if (data[start].rchild < 0) {
+			if (data[start].lchild < 0) {
+				break;
+			}
+			else if (data[data[start].lchild].depth == 1) {
+				start = data[start].parent;
+				rtn.child = rtn.current;
+				rtn.current = false;
+				continue;
+			}
+			else {
+				rtn.child = rtn.current;
+				rtn.current = true;
+				rtn.subtree = current;
+				return rtn;
+			}
+		}
+		if (data[data[start].rchild].depth == data[data[start].lchild].depth) {
+			break;
+		}
+		if (data[data[start].rchild].depth + 1 == data[data[start].lchild].depth) {
+			start = data[start].parent;
+			rtn.child = rtn.current;
+			if (data[data[start].parent].rchild == start) {
+				rtn.current = true;
+			}
+			else {
+				rtn.current = false;
+			}
+			continue;
+		}
+		if (data[data[start].lchild].depth + 1 == data[data[start].rchild].depth) {
+			start = data[start].parent;
+			rtn.child = rtn.current;
+			if (data[data[start].parent].rchild == start) {
+				rtn.current = true;
+			}
+			else {
+				rtn.current = false;
+			}
+			continue;
 		}
 		else {
-			data[start].depth = data[data[start].rchild].depth + 1;
-			if ((data[data[start].rchild].depth - data[data[start].lchild].depth) == 1) {
-				start = data[start].parent;
-				rtn.child = rtn.current;
-				if (data[data[start].parent].rchild == start) {
-					rtn.current = true;
-				}
-				else {
-					rtn.current = false;
-				}
-			}
-			else {
-				return rtn;
-			}
+			rtn.subtree = start;
+			return rtn;
 		}
 	}
-	return {false,false,-1};
+	return { false,false,-1 };
 }
 
 void BinSort::parse_unbalance(unbalance unb) {
+	cout << "Parsing unbalanced subtrees...\n";
 	if (unb.current == false && unb.child == false) {
 		if (data[unb.subtree].parent < 0) {
 			root = data[unb.subtree].lchild;
@@ -325,3 +374,29 @@ void BinSort::parse_unbalance(unbalance unb) {
 		}
 	}
 }
+
+void BinSort::set_depth(size_t node) {
+	if (data[node].lchild < 0) {
+		if (data[node].rchild < 0) {
+			data[node].depth = 1;
+		}
+		else {
+			data[node].depth = data[data[node].rchild].depth + 1;
+		}
+	}
+	else {
+		if (data[node].rchild < 0) {
+			data[node].depth = data[data[node].lchild].depth + 1;
+		}
+		else {
+			if (data[data[node].lchild].depth >= data[data[node].rchild].depth) {
+				data[node].depth = data[data[node].lchild].depth;
+			}
+			else {
+				data[node].depth = data[data[node].rchild].depth;
+			}
+		}
+	}
+}
+
+

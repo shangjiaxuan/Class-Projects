@@ -39,6 +39,14 @@ public:
 	unbalance add_right(size_t subtree, size_t added);
 
 	void parse_unbalance(unbalance unb);
+
+	void UI();
+
+	void search_verbose(int index);
+
+	void print();
+
+	void set_depth(size_t node);
 };
 
 
