@@ -6,16 +6,36 @@ std::string parse_path(std::string line);
 
 struct node {
 	int data;
-	size_t lchild;
-	size_t rchild;
-	size_t parent;
-	size_t depth;
+	long long lchild{ -1 };
+	long long rchild{ -1 };
+	long long parent{ -1 };
+	size_t depth{ 1 };
 };
 
 class BinSort {
 	BinSort();
 	node* data;
-	size_t root;
+	size_t root{ 0 };
+	size_t size{ 0 };
+
+	void init(std::istream& ist);
+	void sort(std::istream& ist);
+	void add(size_t added);
+
+	struct unbalance {
+		bool current;
+		bool child;
+		long long subtree;
+	};
+
+	size_t find_parent_node(size_t root, int data);
+
+	unbalance find_smallest_unbalance(long long start, bool current);
+
+	unbalance add_left(size_t subtree, size_t added);
+	unbalance add_right(size_t subtree, size_t added);
+
+	void parse_unbalance(unbalance unb);
 };
 
 
