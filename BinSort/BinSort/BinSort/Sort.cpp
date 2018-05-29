@@ -32,10 +32,8 @@ BinSort::BinSort() {
 		sort(ifs);
 		ifs.close();
 	}
-	cout << "Done sorting the indexes.!\n" <<endl;
-	cout << "Current memory status is:\n";
-	print();
 	cout << endl;
+	cout << "Done sorting the indexes.!\n" <<endl;
 }
 
 void BinSort::init(istream& ist) {
@@ -57,19 +55,12 @@ void BinSort::sort(istream& ist) {
 }
 
 void BinSort::add(size_t added) {
-	cout<<"current memory is:\n";
-	print();
-	cout << "Adding node " << added << '\n';
 	long long root=find_parent_node(this->root, data[added].data);
-	cout << "parent found to be " << root << '\n';
 	if (root < 0) {
 		return;
 	}
 	if (data[added].data < data[root].data) {
-		cout << "Adding to left of parent..\n";
 		unbalance unb = add_left(root, added);
-		cout << "current memory is:\n";
-		print();
 		if (unb.subtree<0) {
 			return;
 		}
@@ -78,10 +69,7 @@ void BinSort::add(size_t added) {
 		}
 	}
 	else if (data[added].data >= data[root].data) {
-		cout << "Adding to right of parent..\n";
 		unbalance unb = add_right(root, added);
-		cout << "current memory is:\n";
-		print();
 		if (unb.subtree<0) {
 			return;
 		}
@@ -113,17 +101,14 @@ long long BinSort::find_parent_node(long long root, int index) {
 }
 
 BinSort::unbalance BinSort::add_left(size_t subtree, size_t added) {
-	cout << "current memory is:\n";
-	print();
 	data[subtree].lchild = added;
 	data[added].parent = subtree;
 	data[added].depth = 1;
 	return find_smallest_unbalance(subtree,false);
+
 }
 
 BinSort::unbalance BinSort::add_right(size_t subtree, size_t added) {
-	cout << "current memory is:\n";
-	print();
 	data[subtree].rchild = added;
 	data[added].parent = subtree;
 	data[added].depth = 1;
@@ -139,15 +124,20 @@ BinSort::unbalance BinSort::find_smallest_unbalance(long long start,bool current
 				break;
 			}
 			else if (data[data[start].rchild].depth==1) {
+				rtn.child = true;
+				if (data[data[start].parent].rchild == start) {
+					rtn.current = true;
+				}
+				else {
+					rtn.current = false;
+				}
 				start = data[start].parent;
-				rtn.child = rtn.current;
-				rtn.current = true;
 				continue;
 			}
 			else {
 				rtn.child = rtn.current;
 				rtn.current = true;
-				rtn.subtree = current;
+				rtn.subtree = start;
 				return rtn;
 			}
 		}
@@ -156,15 +146,20 @@ BinSort::unbalance BinSort::find_smallest_unbalance(long long start,bool current
 				break;
 			}
 			else if (data[data[start].lchild].depth == 1) {
-				start = data[start].parent;
-				rtn.child = rtn.current;
 				rtn.current = false;
+				if (data[data[start].parent].rchild == start) {
+					rtn.current = true;
+				}
+				else {
+					rtn.current = false;
+				}
+				start = data[start].parent;
 				continue;
 			}
 			else {
 				rtn.child = rtn.current;
-				rtn.current = true;
-				rtn.subtree = current;
+				rtn.current = false;
+				rtn.subtree = start;
 				return rtn;
 			}
 		}
@@ -172,7 +167,6 @@ BinSort::unbalance BinSort::find_smallest_unbalance(long long start,bool current
 			break;
 		}
 		if (data[data[start].rchild].depth + 1 == data[data[start].lchild].depth) {
-			start = data[start].parent;
 			rtn.child = rtn.current;
 			if (data[data[start].parent].rchild == start) {
 				rtn.current = true;
@@ -180,10 +174,10 @@ BinSort::unbalance BinSort::find_smallest_unbalance(long long start,bool current
 			else {
 				rtn.current = false;
 			}
+			start = data[start].parent;
 			continue;
 		}
 		if (data[data[start].lchild].depth + 1 == data[data[start].rchild].depth) {
-			start = data[start].parent;
 			rtn.child = rtn.current;
 			if (data[data[start].parent].rchild == start) {
 				rtn.current = true;
@@ -191,6 +185,7 @@ BinSort::unbalance BinSort::find_smallest_unbalance(long long start,bool current
 			else {
 				rtn.current = false;
 			}
+			start = data[start].parent;
 			continue;
 		}
 		else {
@@ -205,7 +200,6 @@ void BinSort::parse_unbalance(unbalance unb) {
 	if (unb.subtree < 0) {
 		return;
 	}
-	cout << "Parsing unbalanced subtrees...\n";
 	if (unb.current == false && unb.child == false) {
 		if (data[unb.subtree].parent < 0) {
 			root = data[unb.subtree].lchild;
@@ -225,8 +219,10 @@ void BinSort::parse_unbalance(unbalance unb) {
 			}
 		}
 		data[unb.subtree].parent = data[unb.subtree].lchild;
-		data[unb.subtree].lchild = data[data[unb.subtree].lchild].rchild;
+		data[unb.subtree].lchild = data[data[unb.subtree].parent].rchild;
+		data[data[unb.subtree].parent].rchild = unb.subtree;
 		set_depth(unb.subtree);
+		set_depth(data[unb.subtree].parent);
 		while(true) {
 			unb = find_smallest_unbalance(data[unb.subtree].parent, false);
 			if (unb.subtree < 0) {
@@ -254,8 +250,10 @@ void BinSort::parse_unbalance(unbalance unb) {
 			}
 		}
 		data[unb.subtree].parent = data[unb.subtree].rchild;
-		data[unb.subtree].rchild = data[data[unb.subtree].rchild].lchild;
+		data[unb.subtree].rchild = data[data[unb.subtree].parent].lchild;
+		data[data[unb.subtree].parent].lchild = unb.subtree;
 		set_depth(unb.subtree);
+		set_depth(data[unb.subtree].parent);
 		while (true) {
 			unb = find_smallest_unbalance(data[unb.subtree].parent, true);
 			if (unb.subtree < 0) {
@@ -355,10 +353,10 @@ void BinSort::set_depth(size_t node) {
 		}
 		else {
 			if (data[data[node].lchild].depth >= data[data[node].rchild].depth) {
-				data[node].depth = data[data[node].lchild].depth;
+				data[node].depth = data[data[node].lchild].depth + 1;
 			}
 			else {
-				data[node].depth = data[data[node].rchild].depth;
+				data[node].depth = data[data[node].rchild].depth + 1;
 			}
 		}
 	}

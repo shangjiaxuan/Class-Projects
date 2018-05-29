@@ -3,9 +3,21 @@
 using namespace std;
 
 int main() {
-	BinSort This;
-	This.search_verbose(5);
-	system("pause");
+	BinSort::name_ver();
+	try {
+		BinSort This;
+		while (on) {
+			try {
+				This.UI();
+			}
+			catch (exception& e) {
+				cerr << e.what() << '\n' << endl;
+			}
+		}
+	}
+	catch (exception& e) {
+		cerr << e.what() << '\n' << endl;
+	}
 	return 0;
 }
 

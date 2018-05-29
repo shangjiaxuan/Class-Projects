@@ -2,9 +2,10 @@
 
 using namespace std;
 
-void BinSort::UI() {
+bool on{ true };
+
+void BinSort::search() {
 	int index;
-	cout << "Please specify a index to search for:\n";
 	cin >> index;
 	search_verbose(index);
 }
@@ -39,5 +40,37 @@ void BinSort::print() {
 		cout << "rChild:\t" << data[i].rchild << '\n';
 		cout << endl;
 	}
+}
+
+void BinSort::UI() {
+	cout << ">";
+	if (isdigit(cin.peek())) {
+		search();
+	}
+	else {
+		string cmd;
+		cin >> cmd;
+		if (cmd == "exit") {
+			on = false;
+		}
+		else if (cmd == "search") {
+			search();
+		}
+		else if (cmd == "print") {
+			cout << endl;
+			cout << "The following is the memory of the items:\n" << endl;
+			print();
+		}
+	}
+	char c;
+	do {
+		cin.get(c);
+	} while (c != '\n');
+}
+
+void BinSort::name_ver() {
+	cout << "Simple binary sort program\n";
+	cout << "v0.0.0.0\n";
+	cout << endl;
 }
 

@@ -4,6 +4,8 @@
 
 std::string parse_path(std::string line);
 
+extern bool on;
+
 struct node {
 	int data;
 	long long lchild{ -1 };
@@ -40,13 +42,16 @@ public:
 
 	void parse_unbalance(unbalance unb);
 
-	void UI();
-
 	void search_verbose(int index);
 
 	void print();
 
 	void set_depth(size_t node);
+
+
+	void UI();
+	void search();
+	static void name_ver();
 };
 
 
