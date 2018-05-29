@@ -53,7 +53,10 @@ void BinSort::sort(istream& ist) {
 }
 
 void BinSort::add(size_t added) {
-	size_t root=find_parent_node(this->root, data[added].data);
+	long long root=find_parent_node(this->root, data[added].data);
+	if (root < 0) {
+		return;
+	}
 	if (data[added].data < data[root].data) {
 		unbalance unb = add_left(root, added);
 		if (unb.subtree<0) {
@@ -74,8 +77,12 @@ void BinSort::add(size_t added) {
 	}
 }
 
-size_t BinSort::find_parent_node(size_t root, int index) {
+long long BinSort::find_parent_node(long long root, int index) {
 	size_t trace;
+	if (start) {
+		start = false;
+		return -1;
+	}
 	while (root >= 0) {
 		if (index < data[root].data) {
 			trace = root;
@@ -167,9 +174,21 @@ void BinSort::parse_unbalance(unbalance unb) {
 		}
 		data[unb.subtree].parent = data[unb.subtree].lchild;
 		data[unb.subtree].lchild = data[data[unb.subtree].lchild].rchild;
-		return;
+		if (data[data[unb.subtree].lchild].depth >= data[data[unb.subtree].rchild].depth) {
+			data[unb.subtree].depth = data[data[unb.subtree].lchild].depth + 1;
+		}
+		else {
+			data[unb.subtree].depth = data[data[unb.subtree].rchild].depth + 1;
+		}
+		while(true) {
+			unb = find_smallest_unbalance(unb.subtree, false);
+			if (unb.subtree < 0) {
+				break;
+			}
+			parse_unbalance(unb);
+		}
 	}
-	if (unb.current == true && unb.child == true) {
+	else if (unb.current == true && unb.child == true) {
 		if (data[unb.subtree].parent < 0) {
 			root = data[unb.subtree].rchild;
 			data[data[unb.subtree].rchild].parent = -1;
@@ -189,9 +208,21 @@ void BinSort::parse_unbalance(unbalance unb) {
 		}
 		data[unb.subtree].parent = data[unb.subtree].rchild;
 		data[unb.subtree].rchild = data[data[unb.subtree].rchild].lchild;
-		return;
+		if (data[data[unb.subtree].lchild].depth >= data[data[unb.subtree].rchild].depth) {
+			data[unb.subtree].depth = data[data[unb.subtree].lchild].depth + 1;
+		}
+		else {
+			data[unb.subtree].depth = data[data[unb.subtree].rchild].depth + 1;
+		}
+		while (true) {
+			unb = find_smallest_unbalance(unb.subtree, false);
+			if (unb.subtree < 0) {
+				break;
+			}
+			parse_unbalance(unb);
+		}
 	}
-	if (unb.current == false && unb.child == true) {
+	else if (unb.current == false && unb.child == true) {
 		if (data[unb.subtree].parent < 0) {
 			root = data[data[unb.subtree].lchild].rchild;
 			data[data[data[unb.subtree].lchild].rchild].parent = -1;
@@ -215,9 +246,34 @@ void BinSort::parse_unbalance(unbalance unb) {
 		data[data[unb.subtree].parent].lchild = data[unb.subtree].lchild;
 		data[unb.subtree].lchild = data[data[unb.subtree].parent].rchild;
 		data[data[unb.subtree].parent].rchild = unb.subtree;
-		return;
+
+		if (data[data[unb.subtree].lchild].depth >= data[data[unb.subtree].rchild].depth) {
+			data[unb.subtree].depth = data[data[unb.subtree].lchild].depth + 1;
+		}
+		else {
+			data[unb.subtree].depth = data[data[unb.subtree].rchild].depth + 1;
+		}
+		if (data[data[data[data[unb.subtree].parent].lchild].lchild].depth >= data[data[data[data[unb.subtree].parent].lchild].rchild].depth) {
+			data[data[data[data[unb.subtree].parent].lchild].depth = data[data[data[unb.subtree].parent].lchild].lchild].depth + 1;
+		}
+		else {
+			data[data[data[data[unb.subtree].parent].lchild].depth = data[data[data[unb.subtree].parent].lchild].rchild].depth + 1;
+		}
+		if (data[data[data[unb.subtree].parent].lchild].depth >= data[data[data[unb.subtree].parent].rchild].depth) {
+			data[data[unb.subtree].parent].depth = data[data[data[unb.subtree].parent].lchild].depth + 1;
+		}
+		else {
+			data[data[unb.subtree].parent].depth = data[data[data[unb.subtree].parent].rchild].depth + 1;
+		}
+		while (true) {
+			unb = find_smallest_unbalance(data[unb.subtree].parent, false);
+			if (unb.subtree < 0) {
+				break;
+			}
+			parse_unbalance(unb);
+		}
 	}
-	if (unb.current == true && unb.child == false) {
+	else if (unb.current == true && unb.child == false) {
 		if (data[unb.subtree].parent < 0) {
 			root = data[data[unb.subtree].rchild].lchild;
 			data[data[data[unb.subtree].rchild].lchild].parent = -1;
@@ -241,6 +297,31 @@ void BinSort::parse_unbalance(unbalance unb) {
 		data[data[unb.subtree].parent].rchild = data[unb.subtree].rchild;
 		data[unb.subtree].rchild = data[data[unb.subtree].parent].lchild;
 		data[data[unb.subtree].parent].lchild = unb.subtree;
-		return;
+
+		if (data[data[unb.subtree].lchild].depth >= data[data[unb.subtree].rchild].depth) {
+			data[unb.subtree].depth = data[data[unb.subtree].lchild].depth + 1;
+		}
+		else {
+			data[unb.subtree].depth = data[data[unb.subtree].rchild].depth + 1;
+		}
+		if (data[data[data[data[unb.subtree].parent].rchild].lchild].depth >= data[data[data[data[unb.subtree].parent].rchild].rchild].depth) {
+			data[data[data[data[unb.subtree].parent].rchild].depth = data[data[data[unb.subtree].parent].rchild].lchild].depth + 1;
+		}
+		else {
+			data[data[data[data[unb.subtree].parent].rchild].depth = data[data[data[unb.subtree].parent].rchild].rchild].depth + 1;
+		}
+		if (data[data[data[unb.subtree].parent].lchild].depth >= data[data[data[unb.subtree].parent].rchild].depth) {
+			data[data[unb.subtree].parent].depth = data[data[data[unb.subtree].parent].lchild].depth + 1;
+		}
+		else {
+			data[data[unb.subtree].parent].depth = data[data[data[unb.subtree].parent].rchild].depth + 1;
+		}
+		while (true) {
+			unb = find_smallest_unbalance(data[unb.subtree].parent, false);
+			if (unb.subtree < 0) {
+				break;
+			}
+			parse_unbalance(unb);
+		}
 	}
 }

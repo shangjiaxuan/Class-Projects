@@ -13,6 +13,7 @@ struct node {
 };
 
 class BinSort {
+public:
 	BinSort();
 	node* data;
 	size_t root{ 0 };
@@ -28,7 +29,9 @@ class BinSort {
 		long long subtree;
 	};
 
-	size_t find_parent_node(size_t root, int data);
+	bool start = true;
+
+	long long find_parent_node(long long root, int data);
 
 	unbalance find_smallest_unbalance(long long start, bool current);
 

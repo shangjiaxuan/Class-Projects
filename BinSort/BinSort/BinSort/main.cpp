@@ -3,6 +3,8 @@
 using namespace std;
 
 int main() {
+	BinSort This;
+	system("pause");
 	return 0;
 }
 
