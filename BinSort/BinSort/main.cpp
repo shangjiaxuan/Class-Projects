@@ -1,23 +1,22 @@
-﻿#include "Search.h"
+#include "BinSort.h"
 
 using namespace std;
 
 int main() {
-	search::name_ver();
-	while (on) {
-		try {
-			search This;
-			do {
-				try {
-					This.UI();
-				}
-				catch (exception& e) {
-					cerr << e.what() << "\n" << endl;
-				}
-			} while (This.conti);
-		}catch (exception& e) {
-			cerr << e.what() << "\n" << endl;
+	BinSort::name_ver();
+	try {
+		BinSort This;
+		while (on) {
+			try {
+				This.UI();
+			}
+			catch (exception& e) {
+				cerr << e.what() << '\n' << endl;
+			}
 		}
+	}
+	catch (exception& e) {
+		cerr << e.what() << '\n' << endl;
 	}
 	return 0;
 }

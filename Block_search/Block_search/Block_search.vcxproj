@@ -23,7 +23,7 @@
     <ProjectGuid>{0A97FDB1-17ED-4294-BBC3-41515F5F5AC8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Blocksearch</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
