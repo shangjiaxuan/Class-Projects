@@ -23,7 +23,7 @@
     <ProjectGuid>{D3C655CF-FBAB-46BE-B828-6E93C3948621}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CharTree</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
     <ProjectName>Book</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
